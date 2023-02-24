@@ -33,7 +33,7 @@ namespace CareData.DataContext.Infrastructure
 
 		private static void Seed(CareContext context)
 		{
-			var stub = GenerateData(20);
+			var stub = GenerateData(10);
 
 			foreach (var employee in stub)
 			{
@@ -96,8 +96,7 @@ namespace CareData.DataContext.Infrastructure
 				.RuleFor(c => c.Reason, f => f.PickRandom(reason))
 				.RuleFor(c => c.Action, f => f.PickRandom(actions))
 				.RuleFor(c => c.IsActive, f => true)
-				.RuleFor(c => c.Completed, f => f.PickRandom(completed))
-				.RuleFor(c => c.Outcome, f => string.Empty)
+				.RuleFor(c => c.Completed, f => f.PickRandom(completed)) 
 				.RuleFor(c => c.IpAddress, f => f.Internet.IpAddress().ToString())
 				.RuleFor(c => c.DateCreated, f => f.Date.Recent(5))
 				.RuleFor(c => c.TargetStartDate, f => f.Date.Recent(3))

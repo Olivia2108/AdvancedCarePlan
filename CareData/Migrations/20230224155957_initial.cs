@@ -41,7 +41,7 @@ namespace CareData.Migrations
                     Action = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Reason = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Completed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Outcome = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Outcome = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     TargetStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ActualStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ActualEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),

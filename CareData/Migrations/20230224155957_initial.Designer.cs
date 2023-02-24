@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CareData.Migrations
 {
     [DbContext(typeof(CareContext))]
-    [Migration("20230224152403_initial")]
+    [Migration("20230224155957_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -108,7 +108,6 @@ namespace CareData.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Outcome")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 

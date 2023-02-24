@@ -106,7 +106,6 @@ namespace CareData.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Outcome")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 

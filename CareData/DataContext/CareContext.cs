@@ -1,16 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore; 
 using CareData.Models;
 using CareData.DataContext.Contracts;
 using static CareShared.Middleware.Enums.GeneralEnums;
-using CareShared.Dto;
-using System.Reflection;
-using CareData.DataContext.Infrastructure;
+using CareShared.Dto; 
 
 namespace CareData.DataContext
 {
@@ -41,6 +34,10 @@ namespace CareData.DataContext
 
 		protected override void OnModelCreating(ModelBuilder? modelBuilder)
 		{
+
+			if (modelBuilder == null)
+				return;
+
 			modelBuilder.Entity<CarePlan>(entity =>
 			{
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -63,23 +60,11 @@ namespace CareData.DataContext
 
 				entity.Property(e => e.DateCreated).HasDefaultValueSql("getdate()");
 			});
+			
+
+			base.OnModelCreating(modelBuilder);
+
 			 
-			if (modelBuilder == null)
-				return;
-
-			base.OnModelCreating(modelBuilder);
-
-			foreach (var seeder in Assembly.GetExecutingAssembly().ExportedTypes
-				.Where(type => type.BaseType == typeof(ISeeder)))
-			{
-				(Activator.CreateInstance(seeder) as ISeeder)?.Seed(modelBuilder);
-			}
-
-			//modelBuilder.ApplyConfiguration(new FixedDepositConfiguration());
-
-			//....Other Config
-
-			base.OnModelCreating(modelBuilder);
 		}
 
 
