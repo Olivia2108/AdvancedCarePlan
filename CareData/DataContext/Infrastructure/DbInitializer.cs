@@ -97,6 +97,7 @@ namespace CareData.DataContext.Infrastructure
 				.RuleFor(c => c.Action, f => f.PickRandom(actions))
 				.RuleFor(c => c.IsActive, f => true)
 				.RuleFor(c => c.Completed, f => f.PickRandom(completed))
+				.RuleFor(c => c.Outcome, f => string.Empty)
 				.RuleFor(c => c.IpAddress, f => f.Internet.IpAddress().ToString())
 				.RuleFor(c => c.DateCreated, f => f.Date.Recent(5))
 				.RuleFor(c => c.TargetStartDate, f => f.Date.Recent(3))
@@ -107,13 +108,27 @@ namespace CareData.DataContext.Infrastructure
 			var plans = faker.Generate(count);
 			plans.Where(x=> x.Completed).ToList().ForEach(async plan =>
 			{
-				int index = random.Next(outcome.Length);
-				plan.ActualEndDate = plan.ActualStartDate.AddDays(30);
-				 plan.Outcome = index.ToString();
+				plan.Outcome = outcome
+				[
+					new Random().Next(0, outcome.Length)
+				]; 
+				plan.ActualEndDate = plan.ActualStartDate.AddDays(30); 
 			});
-			 
 
-			return faker.Generate(count);
+			plans.Where(x => x.Action == nameof(Actions.Delete)).ToList().ForEach(async plan =>
+			{
+				plan.IsActive = false;
+				plan.DateDeleted = DateTime.Now;
+				plan.IsDeleted = true;
+			});
+
+			plans.Where(x => x.Action == nameof(Actions.Update)).ToList().ForEach(async plan =>
+			{ 
+				plan.DateUpdated = DateTime.Now; 
+			});
+
+
+			return plans;
 
 		} 
 

@@ -9,6 +9,8 @@ using CareData.Models;
 using CareData.DataContext.Contracts;
 using static CareShared.Middleware.Enums.GeneralEnums;
 using CareShared.Dto;
+using System.Reflection;
+using CareData.DataContext.Infrastructure;
 
 namespace CareData.DataContext
 {
@@ -25,8 +27,61 @@ namespace CareData.DataContext
 		}
 
 
-		public DbSet<CarePlan> CarePlan { get; set; }
-		public DbSet<AuditTrail> AuditLogs { get; set; }
+		public DbSet<CarePlan>? CarePlan { get; set; }
+		public DbSet<AuditTrail>? AuditLogs { get; set; }
+
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		{
+			if (!optionsBuilder.IsConfigured)
+			{
+
+			}
+		}
+
+
+		protected override void OnModelCreating(ModelBuilder? modelBuilder)
+		{
+			modelBuilder.Entity<CarePlan>(entity =>
+			{
+				entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+				entity.Property(e => e.UserName).HasMaxLength(450);
+
+				entity.Property(e => e.PatientName).HasMaxLength(450);
+
+				entity.Property(e => e.Title).HasMaxLength(450);
+
+				entity.Property(e => e.Outcome).HasMaxLength(1000);
+
+				entity.Property(e => e.Action).HasMaxLength(1000);
+
+				entity.Property(e => e.Completed).HasDefaultValue(false);
+
+				entity.Property(e => e.Reason).HasMaxLength(1000);
+
+				entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+				entity.Property(e => e.DateCreated).HasDefaultValueSql("getdate()");
+			});
+			 
+			if (modelBuilder == null)
+				return;
+
+			base.OnModelCreating(modelBuilder);
+
+			foreach (var seeder in Assembly.GetExecutingAssembly().ExportedTypes
+				.Where(type => type.BaseType == typeof(ISeeder)))
+			{
+				(Activator.CreateInstance(seeder) as ISeeder)?.Seed(modelBuilder);
+			}
+
+			//modelBuilder.ApplyConfiguration(new FixedDepositConfiguration());
+
+			//....Other Config
+
+			base.OnModelCreating(modelBuilder);
+		}
+
 
 
 

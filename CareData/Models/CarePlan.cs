@@ -14,22 +14,28 @@ namespace CareData.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long Id { get; set; }
 
+		[Required] 
 		[MaxLength(450)]
 		public string? Title { get; set; }
 
+		[Required]
 		[MaxLength(450)]
 		public string? UserName { get; set; }
 
+		[Required]
 		[MaxLength(450)]
 		public string? PatientName { get; set; }
 
+		[Required]
 		[MaxLength(1000)]
 		public string? Action { get; set; }
 
+		[Required]
 		[MaxLength(1000)]
 		public string? Reason { get; set; }
+		 
 		public bool Completed { get; set; }
-
+		 
 		[MaxLength(1000)]
 		public string? Outcome { get; set; }
 		public DateTime TargetStartDate { get; set; }

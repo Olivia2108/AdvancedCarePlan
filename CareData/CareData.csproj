@@ -25,4 +25,8 @@
     <ProjectReference Include="..\CareShared\CareShared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using AutoMapper.Configuration;
 
 namespace CareData.DataContext.Infrastructure
 {
     public abstract class CareDesignTimeDbContextFactoryBase<TContext> : IDesignTimeDbContextFactory<TContext> where TContext : DbContext
 	{
-		private const string ConnectionStringName = "CareConn";
+		private string ConnectionStringName = "CarePlan_Docker";
 		private const string AspNetCoreEnvironment = "ASPNETCORE_ENVIRONMENT";
 
 		public TContext CreateDbContext(string[] args)
@@ -27,8 +28,20 @@ namespace CareData.DataContext.Infrastructure
 				.AddEnvironmentVariables()
 				.Build();
 
-			var connectionString = configuration.GetConnectionString(ConnectionStringName);
+			var env = configuration.GetSection("Env:docker").Value; 
+			string connectionString = string.Empty;
+			switch (env)
+			{
+				case "true":
+					connectionString = configuration.GetConnectionString("CarePlan_Docker");
+					break;
 
+				default:
+					connectionString = configuration.GetConnectionString("CarePlan_Local");
+					break;
+			}
+
+			ConnectionStringName = connectionString;
 			return Create(connectionString);
 		}
 
