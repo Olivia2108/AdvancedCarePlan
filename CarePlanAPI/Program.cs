@@ -1,5 +1,11 @@
 
+using CareData.DataContext;
+using CareData.DataContext.Contracts;
+using CareData.DataContext.Infrastructure;
 using CareDomain;
+using CareShared.Middleware.Common.Helpers;
+using CareShared.Middleware.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using NLog;
 
 namespace CarePlanAPI
@@ -34,7 +40,30 @@ namespace CarePlanAPI
 
 				builder.Services.AddControllers();
 				// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-				builder.Services.AddEndpointsApiExplorer(); 
+				builder.Services.AddEndpointsApiExplorer();
+
+				builder.Services.AddRepositoryDependency(Configuration);
+
+
+				var env = Configuration.GetValue<string>("Env:docker");
+				string connectionString = string.Empty;
+				switch (env)
+				{
+					case "true":
+						connectionString = builder.Configuration.GetConnectionString("CarePlan_Docker");
+						break;
+
+					default:
+						connectionString = builder.Configuration.GetConnectionString("CarePlan_Local");
+						break;
+				}
+
+
+				builder.Services.AddDbContext<CareContext>(options =>
+				{
+					options.UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(CareContext).Assembly.FullName)); 
+				});
+
 
 
 				//Call the Program DI class
@@ -49,8 +78,8 @@ namespace CarePlanAPI
 				void SeedDatabase()
 				{
 					using var scope = app.Services.CreateScope();
-					//var scopedContext = scope.ServiceProvider.GetRequiredService<HahnContext>();
-					//DbInitializer.Initializer(scopedContext);
+					var scopedContext = scope.ServiceProvider.GetRequiredService<CareContext>();
+					DbInitializer.Initializer(scopedContext);
 				}
 
 
@@ -60,6 +89,9 @@ namespace CarePlanAPI
 					app.UseSwagger();
 					app.UseSwaggerUI();
 				}
+
+				//Configure Exception Middelware
+				app.UseMiddleware<ExceptionMiddleware>();
 
 				app.UseHttpsRedirection();
 

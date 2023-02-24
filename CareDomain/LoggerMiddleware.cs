@@ -3,7 +3,7 @@
 namespace CareDomain
 {
 
-	public static class LoggerMiddleware
+	public static class LoggerMiddlewareb
 	{
 		private static ILogger logger = LogManager.GetCurrentClassLogger();
 

@@ -1,9 +1,12 @@
 ﻿using NLog;
-using ILogger = NLog.ILogger;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CarePlanWeb.Utility
+namespace CareShared.Middleware.Exceptions
 {
-
 	public static class LoggerMiddleware
 	{
 		private static ILogger logger = LogManager.GetCurrentClassLogger();

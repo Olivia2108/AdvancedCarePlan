@@ -1,4 +1,5 @@
 using CarePlanWeb.Utility;
+using CareShared.Middleware.Exceptions;
 using NLog;
 
 namespace CarePlanWeb
@@ -45,6 +46,9 @@ namespace CarePlanWeb
 					app.UseHsts();
 				}
 
+
+				//Configure Exception Middelware
+				app.UseMiddleware<ExceptionMiddleware>();
 				app.UseHttpsRedirection();
 				app.UseStaticFiles();
 
