@@ -20,7 +20,7 @@ namespace Infrastructure.Persistence
 		}
 
 
-		public DbSet<PatientCarePlan>? CarePlan { get; set; }
+		public DbSet<PatientCarePlan>? PatientCarePlan { get; set; }
 		public DbSet<AuditTrail>? AuditLogs { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -42,25 +42,26 @@ namespace Infrastructure.Persistence
 			{
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-				entity.Property(e => e.UserName).HasMaxLength(450);
+				entity.Property(e => e.UserName).HasMaxLength(450).IsRequired();
 
-				entity.Property(e => e.PatientName).HasMaxLength(450);
+				entity.Property(e => e.PatientName).HasMaxLength(450).IsRequired();
 
-				entity.Property(e => e.Title).HasMaxLength(450);
+				entity.Property(e => e.Title).HasMaxLength(450).IsRequired();
 
 				entity.Property(e => e.Outcome).HasMaxLength(1000);
 
-				entity.Property(e => e.Action).HasMaxLength(1000);
+				entity.Property(e => e.Action).HasMaxLength(1000).IsRequired();
 
 				entity.Property(e => e.Completed).HasDefaultValue(false);
 
-				entity.Property(e => e.Reason).HasMaxLength(1000);
+				entity.Property(e => e.Reason).HasMaxLength(1000).IsRequired();
 
 				entity.Property(e => e.IsActive).HasDefaultValue(true);
 
 				entity.Property(e => e.DateCreated).HasDefaultValueSql("getdate()");
 			});
-			
+
+			modelBuilder.ApplyConfigurationsFromAssembly(typeof(CareContext).Assembly);
 
 			base.OnModelCreating(modelBuilder);
 

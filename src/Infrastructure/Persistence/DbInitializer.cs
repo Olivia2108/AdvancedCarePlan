@@ -18,7 +18,7 @@ namespace Infrastructure.Persistence
         {
             context.Database.Migrate();
 
-            if (context.CarePlan.Any())
+            if (context.PatientCarePlan.Any())
             {
                 LoggerMiddleware.LogInfo("Plan exist");
             }
@@ -36,7 +36,7 @@ namespace Infrastructure.Persistence
 
             foreach (var employee in stub)
             {
-                context.CarePlan.AddAsync(employee);
+                context.PatientCarePlan.AddAsync(employee);
             }
 
             var ty = context.SaveChangesAsync(stub.FirstOrDefault().IpAddress).GetAwaiter().GetResult();

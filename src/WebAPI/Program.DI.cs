@@ -110,7 +110,7 @@ namespace WebAPI
 				c.SwaggerDoc("v1", new OpenApiInfo
 				{
 					Version = "v1",
-					Title = "Care Plan Api service",
+					Title = "Patient Care Plan Api service",
 					Description = "Care Plan Api",
 					Contact = new OpenApiContact()
 					{

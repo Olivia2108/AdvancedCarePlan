@@ -33,7 +33,7 @@ namespace CarePlanUnitTest.Fixtures
 
             foreach (var plan in stub)
             {
-                context.CarePlan.AddAsync(plan);
+                context.PatientCarePlan.AddAsync(plan);
             }
 
 
