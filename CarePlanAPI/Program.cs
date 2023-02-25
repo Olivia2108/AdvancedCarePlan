@@ -45,7 +45,7 @@ namespace CarePlanAPI
 				builder.Services.AddRepositoryDependency(Configuration);
 
 
-				var env = Configuration.GetValue<string>("Env:docker");
+                var env = Configuration.GetValue<string>("Env:docker");
 				string connectionString = string.Empty;
 				switch (env)
 				{

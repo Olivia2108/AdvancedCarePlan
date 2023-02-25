@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using CareShared.Middleware.Exceptions;
+using CareShared.Middleware.ModelHelpers;
 
 namespace CareShared.Middleware.Exceptions
 {
@@ -33,8 +34,8 @@ namespace CareShared.Middleware.Exceptions
 		{
 			context.Response.ContentType = "application/json";
 			context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-			await context.Response.WriteAsync(new
-			{
+			await context.Response.WriteAsync(new ErrorDTO()
+            {
 				StatusCode = context.Response.StatusCode,
 				Message = "Internal Server Error from the custom middleware."
 			}.ToString());

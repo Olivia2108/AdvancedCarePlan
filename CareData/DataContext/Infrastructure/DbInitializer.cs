@@ -123,8 +123,20 @@ namespace CareData.DataContext.Infrastructure
 
 			return plans;
 
-		} 
+		}
 
-	}
+
+        public static int GiveMeANumber(List<CarePlan> patients)
+        {
+            List<long> IdList = patients.Select(person => person.Id).ToList();
+            var myArray = IdList.ToArray();
+            var exclude = new HashSet<long>(myArray);
+            var range = Enumerable.Range(1, 100).Where(i => !exclude.Contains(i));
+
+            var rand = new Random();
+            int index = rand.Next(0, 100 - exclude.Count);
+            return range.ElementAt(index);
+        }
+    }
 	 
 }

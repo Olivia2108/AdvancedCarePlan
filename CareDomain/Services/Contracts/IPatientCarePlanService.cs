@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CareDomain.Services.Contracts
 {
-	public interface ICarePlanService
+	public interface IPatientCarePlanService
 	{
 	}
 }
