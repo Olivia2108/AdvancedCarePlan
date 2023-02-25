@@ -55,8 +55,17 @@ namespace CarePlanWeb
 				app.UseRouting();
 
 				app.UseAuthorization();
+                app.Use(async (context, next) =>
+                {
+                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN"); 
+                    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+                    context.Response.Headers.Add("Permissions-Policy", "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()");
+                    context.Response.Headers.Add("Content-Security-Policy", ""); 
+                    await next();
+                });
 
-				app.MapControllerRoute(
+                app.MapControllerRoute(
 					name: "default",
 					pattern: "{controller=Home}/{action=Index}/{id?}");
 

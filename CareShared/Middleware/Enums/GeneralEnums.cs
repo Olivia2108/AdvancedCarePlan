@@ -13,14 +13,7 @@ namespace CareShared.Middleware.Enums
 			NoIdFound = -4,
 			ErrorThrown = -5,
 		}
-
-		public enum Actions
-		{ 
-			Create = 0,
-			Update = 1,
-			Delete = 2,
-
-		}
+ 
 		public enum AuditType
 		{
 			None = -1,

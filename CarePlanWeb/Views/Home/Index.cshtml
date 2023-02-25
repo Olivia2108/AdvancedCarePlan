@@ -1,8 +1,771 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+
+    Layout = "~/Views/shared/_IndexLayout.cshtml";
+    int i = 0;
+
+    var min = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd");
+}
+@section Scripts{
+
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tblCallRequests').DataTable({
+                "scrollX": true,
+                "processing": true,
+                //"serverSide": true,
+                "ordering": true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'excelHtml5',
+                    'csvHtml5'
+                ]
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                // ON SELECTING ROW
+                $("#modalClick").click(function () {
+
+                    $("#EditNewPlan").modal("show");
+
+                });
+            });
+        });
+
+
+    </script>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="section-body">
+    <div class="row">
+        <div class="col-12">
+            
+            <div class="card">
+                <div class="card-header">
+                    <div style="float:left">
+                        <h4>Patients Care Plans</h4>
+                    </div>
+                    <div style="float:right;margin-left: 75%">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="border-radius:5px">
+                            Add Plan
+                        </button>
+                    </div>
+                     
+                </div>
+                <div class="card-body">
+                   
+                    <div class="table-responsive" style="overflow-x:visible">
+                        <table class="table table-striped" id="table-1">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        #
+                                    </th>
+                                    <th>Task Name</th>
+                                    <th>Progress</th>
+                                    <th>Members</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        1
+                                    </td>
+                                    <td>Create a mobile app</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success width-per-40">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
+                                    </td>
+                                    <td>2018-01-20</td>
+                                    <td>
+                                        <div class="badge badge-success badge-shadow">Completed</div>
+                                    </td>
+                                    <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary" data-toggle="modal" data-target="#detailsModal">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary" id="modalClick"> 
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger" data-toggle="modal" data-target="#deleteModal">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        2
+                                    </td>
+                                    <td>Redesign homepage</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar width-per-60"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-3.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
+                                    </td>
+                                    <td>2018-04-10</td>
+                                    <td>
+                                        <div class="badge badge-info badge-shadow">Todo</div>
+                                    </td>
+                                     <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a class="btn btn-icon btn-primary" id="modalClick">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        3
+                                    </td>
+                                    <td>Backup database</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-warning width-per-70"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
+                                    </td>
+                                    <td>2018-01-29</td>
+                                    <td>
+                                        <div class="badge badge-warning badge-shadow">In Progress</div>
+                                    </td>
+                                     <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        4
+                                    </td>
+                                    <td>Input data</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success width-per-90"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                    </td>
+                                    <td>2018-01-16</td>
+                                    <td>
+                                        <div class="badge badge-success badge-shadow">Completed</div>
+                                    </td>
+                                    <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        5
+                                    </td>
+                                    <td>Create a mobile app</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success width-per-40">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
+                                    </td>
+                                    <td>2018-01-20</td>
+                                    <td>
+                                        <div class="badge badge-success badge-shadow">Completed</div>
+                                    </td>
+                                    <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        6
+                                    </td>
+                                    <td>Redesign homepage</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar width-per-60"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-3.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
+                                    </td>
+                                    <td>2018-04-10</td>
+                                    <td>
+                                        <div class="badge badge-info badge-shadow">Todo</div>
+                                    </td>
+                                    <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        7
+                                    </td>
+                                    <td>Backup database</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-warning width-per-70"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
+                                    </td>
+                                    <td>2018-01-29</td>
+                                    <td>
+                                        <div class="badge badge-warning badge-shadow">In Progress</div>
+                                    </td>
+                                     <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        8
+                                    </td>
+                                    <td>Input data</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success width-per-90"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                    </td>
+                                    <td>2018-01-16</td>
+                                    <td>
+                                        <div class="badge badge-success badge-shadow">Completed</div>
+                                    </td>
+                                     <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        9
+                                    </td>
+                                    <td>Create a mobile app</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success width-per-40">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
+                                    </td>
+                                    <td>2018-01-20</td>
+                                    <td>
+                                        <div class="badge badge-success badge-shadow">Completed</div>
+                                    </td>
+                                     <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        10
+                                    </td>
+                                    <td>Redesign homepage</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar width-per-60"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-3.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
+                                    </td>
+                                    <td>2018-04-10</td>
+                                    <td>
+                                        <div class="badge badge-info badge-shadow">Todo</div>
+                                    </td>
+                                    <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        11
+                                    </td>
+                                    <td>Backup database</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-warning width-per-70"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
+                                    </td>
+                                    <td>2018-01-29</td>
+                                    <td>
+                                        <div class="badge badge-warning badge-shadow">In Progress</div>
+                                    </td>
+                                    <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        12
+                                    </td>
+                                    <td>Input data</td>
+                                    <td class="align-middle">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success width-per-90"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
+                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
+                                    </td>
+                                    <td>2018-01-16</td>
+                                    <td>
+                                        <div class="badge badge-success badge-shadow">Completed</div>
+                                    </td>
+                                    <td>Action</td>
+                                    <td><a href="#" class="btn btn-primary">View</a></td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-primary">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-icon btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>
+
+
+    <!--Edit Plan-->
+<div class="modal fade" id="EditNewPlan" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true" role="dialog" data-backdrop="false">
+<div class="modal-dialog" role="document" style="padding-top: 7%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="planModalLabel">Add New</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="SaveBackDatingRequests" asp-controller="BackDating" method="post">
+
+
+                <div class="modal-body">
+                    <div class="row-cols-auto">
+
+
+
+                        <div class="row" style="margin:1rem">
+                            <div class="col-12">
+                                <label class="form-label">Account Number</label>
+                                <input class="form-control font-weight-bold amt" placeholder="Account Number" name="accountNo" required onkeypress="return event.charCode === 0 || /\d/.test(String.fromCharCode(event.charCode));" />
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin:1rem">
+                            <div class="col-6">
+                                <label class="form-label">Investment Amount Range</label>
+
+                                @*@{
+                                    var almRange = new List<SelectListItem>();
+                                    var almList = ViewData["Alm_Rates"] != null ? (List<FI_RateDTO>)ViewData["Alm_Rates"] : new List<FI_RateDTO>();
+                                    foreach (var alm in almList.OrderBy(x => x.Date_Uploaded).ToList().OrderBy(x => x.CUR).ToList())
+                                    {
+                                        almRange.Add(new SelectListItem { Value = alm.RANGE, Text = alm.RANGE + " (" + alm.CUR + ")" });
+                                    }
+                                }
+                                @Html.DropDownListFor(x => x.Range, almRange, "Amount Range", new { type = "text", placeholder = "Amount Range", required = "true",   @class = "form-control font-weight-bold" })*@
+
+                                     
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Interest Rate</label>
+                                <input class="form-control font-weight-bold amt" placeholder="Interest Rate" name="rate" required onkeypress="return onlyDotsAndNumbers(this,event);" />
+                            </div>
+                        </div>
+
+                        <!--<div class="row" style="margin:1rem">
+                            <div class="col-6">
+                                <label class="form-label">Investment Amount Range</label>
+                                <select name="range" required class="form-control font-weight-bold ">
+                                    <option value="" selected disabled>Amount Range</option>
+                                    <option value="<1m">Less than 1m</option>
+                                    <option value="1m to <10m">1m to less than 10m (NGN)</option>
+                                    <option value="10m to < 50m">10m to less than 50m (NGN)</option>
+                                    <option value="50m to < 100m">50m to less than 100m (NGN)</option>
+                                    <option value="100m to 500m">100m to less than 500m (NGN)</option>
+                                    <option value=">500m to 5b">More than 500m to less than 5b (NGN)</option>-->
+                                    @*<option value="< 100k">Less than 100k (USD)</option>
+                                    <option value="100k < 500k">100k to less than 500k (USD)</option>
+                                    <option value="$500k -$1m">$500k to $1m (USD)</option>
+                                    <option value="$1m -$3m">$1m to $3m (USD)</option>
+                                    <option value=">$3m - 5m">$3m to $5m (USD)</option>
+                                    <option value=">5m - 5b">$5m to $1b (USD)</option>*@
+                                <!--</select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Interest Rate</label>
+                                <input class="form-control font-weight-bold amt" placeholder="Interest Rate" name="rate" required onkeypress="return onlyDotsAndNumbers(this,event);" />
+                            </div>
+                        </div>-->
+
+
+
+                        <div class="row" style="margin:1rem">
+                            <div class="col-6">
+                                <label class="form-label">EffectiveDate</label>
+                                <input class="form-control font-weight-bold amt" type="date" placeholder="EffectiveDate" name="effectiveDate" required min="@min" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Currency</label>
+                                <select name="currency" required class="form-control font-weight-bold ">
+                                    <option value="" selected disabled>Currency</option>
+                                    <option value="NGN">NGN</option>
+                                    <option value="USD">USD</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin:1rem">
+                            <div class="col-12">
+                                <label class="form-label">Reason</label>
+                                <textarea class="form-control font-weight-bold amt" placeholder="Reason" maxlength="200" name="reason" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <input hidden name="route" value="Call Deposits" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button  class="btn btn-outline-secondary" style="color:black">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal with form -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="formModal"
+     aria-hidden="true" data-backdrop="false">
+    <div class="modal-dialog" role="document" style="padding-top: 7%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="formModal">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Title </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Patient Name</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Username</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Completed</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Target Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Actual Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+
+
+                        <div class="form-group  col-md-6">
+                            <label>Reason</label>
+                            <div class="input-group">
+
+                                <textarea class="form-control">
+
+                            </textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group  col-md-6">
+                            <label>Action</label>
+                            <div class="input-group">
+
+                                <textarea class="form-control">
+
+                            </textarea>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    
+                    <div class="row">
+
+                        <div class="form-group  col-md-6">
+                            <label>Outcome</label>
+                            <div class="input-group">
+
+                                <textarea class="form-control">
+
+                            </textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Actual End Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <button type="button" class="btn btn-primary m-t-15 waves-effect">LOGIN</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal with form -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"data-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Delete</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+                Would you like to proceed
+        </div>
+        <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-primary">Proceed</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+    </div>
+</div>
+
+         <!-- Large modal -->
+<div class="modal fade " id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" data-backdrop="false" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="padding-top: 27%;">
+        <div class="modal-content" >
+        <div class="modal-header">
+        <h5 class="modal-title" id="myLargeModalLabel">Delete</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        Would you like to proceed
+        </div>
+    </div>
+    </div>
 </div>

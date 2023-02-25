@@ -24,6 +24,9 @@ namespace CareShared.Dto
 
 		[StringLength(1000)]
 		public string? Outcome { get; set; }
+
+		[StringLength(1000)]
+		public string? Action { get; set; }
 		public DateTime TargetStartDate { get; set; }
 		public DateTime ActualStartDate { get; set; }
 		public DateTime ActualEndDate { get; set; }

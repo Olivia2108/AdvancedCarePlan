@@ -59,10 +59,14 @@ namespace CareData.DataContext.Infrastructure
 			};
 
 			var actions = new string[] {
-				nameof(Actions.Create),
-				nameof(Actions.Delete),
-				nameof(Actions.Update),
-			};
+                "Triage setup",
+                "Medication prescribed",
+                "Injection prescribed",
+                "Emotional support provided",
+                "Monitoring technology used",
+                "Proper handwashing procedures used",
+                "Support provided"
+            };
 
 
 			var outcome = new string[] {
@@ -73,6 +77,8 @@ namespace CareData.DataContext.Infrastructure
 				"Patient functional status (maintained or improved)",
 				"Patient safety (protected or unharmed)"
 			};
+			
+			 
 			
 
 			var reason = new string[] {
@@ -113,19 +119,7 @@ namespace CareData.DataContext.Infrastructure
 				]; 
 				plan.ActualEndDate = plan.ActualStartDate.AddDays(30); 
 			});
-
-			plans.Where(x => x.Action == nameof(Actions.Delete)).ToList().ForEach(async plan =>
-			{
-				plan.IsActive = false;
-				plan.DateDeleted = DateTime.Now;
-				plan.IsDeleted = true;
-			});
-
-			plans.Where(x => x.Action == nameof(Actions.Update)).ToList().ForEach(async plan =>
-			{ 
-				plan.DateUpdated = DateTime.Now; 
-			});
-
+			 
 
 			return plans;
 

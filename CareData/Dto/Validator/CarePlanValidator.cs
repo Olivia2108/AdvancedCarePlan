@@ -15,6 +15,7 @@ namespace CareData.Dto.Validator
 
 			RuleFor(x => x.Title).NotNull().MaximumLength(450).WithMessage("Title is required");
 			RuleFor(x => x.Reason).NotNull().NotEmpty().MaximumLength(1000);
+			RuleFor(x => x.Action).NotNull().NotEmpty().MaximumLength(1000);
 			RuleFor(x => x.PatientName).NotNull().MaximumLength(450).WithMessage("Patient Name is required.");
 			RuleFor(x => x.UserName).NotNull().MaximumLength(450).WithMessage("User Name is required."); 
 			RuleFor(x => x.Completed).Must(x => x == false || x == true).WithMessage("Completed is required.");
