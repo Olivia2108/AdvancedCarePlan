@@ -1,9 +1,8 @@
-﻿using CareData.DataContext;
-using CareData.DataContext.Infrastructure;
-using CareData.Models;
-using CareData.Repository;
-using CareData.Repository.Contracts;
-using CareDomain.Services.Contracts;
+﻿
+using Application.Common.Interfaces.IRepository;
+using Domain.Entities;
+using Infrastructure.Persistence;
+using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
@@ -32,7 +31,7 @@ namespace CarePlanUnitTest.Fixtures
         }
 
 
-        public static Tuple<IPatientCarePlanRepository, List<CarePlan>, Mock<CareContext>> GetMock()
+        public static Tuple<IPatientCarePlanRepository, List<PatientCarePlan>, Mock<CareContext>> GetMock()
         {
             var stub = DbInitializer.GenerateData(10);
 
@@ -40,25 +39,25 @@ namespace CarePlanUnitTest.Fixtures
             var data = stub.AsQueryable().BuildMock();
             var mockDbContext = new Mock<CareContext>();
 
-            var mockSet = new Mock<DbSet<CarePlan>>();
+            var mockSet = new Mock<DbSet<PatientCarePlan>>();
 
             mockSet
-                .As<IQueryable<CarePlan>>()
+                .As<IQueryable<PatientCarePlan>>()
                 .Setup(m => m.Provider)
                 .Returns(data.Provider);
 
             mockSet
-                .As<IQueryable<CarePlan>>()
+                .As<IQueryable<PatientCarePlan>>()
                 .Setup(m => m.ElementType)
                 .Returns(data.ElementType);
 
             mockSet
-                .As<IQueryable<CarePlan>>()
+                .As<IQueryable<PatientCarePlan>>()
                 .Setup(m => m.Expression)
                 .Returns(data.Expression);
 
             mockSet
-                .As<IQueryable<CarePlan>>()
+                .As<IQueryable<PatientCarePlan>>()
                 .Setup(m => m.GetEnumerator())
                 .Returns(data.GetEnumerator());
 
@@ -75,7 +74,7 @@ namespace CarePlanUnitTest.Fixtures
 
             IPatientCarePlanRepository repository = new PatientCarePlanRepository(mockDbContext.Object);
 
-            return new Tuple<IPatientCarePlanRepository, List<CarePlan>, Mock<CareContext>>(repository, stub, mockDbContext);
+            return new Tuple<IPatientCarePlanRepository, List<PatientCarePlan>, Mock<CareContext>>(repository, stub, mockDbContext);
         }
 
     }

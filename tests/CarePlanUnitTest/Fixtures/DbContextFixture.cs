@@ -1,5 +1,5 @@
-﻿using CareData.DataContext;
-using CareData.DataContext.Infrastructure;
+﻿
+using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
