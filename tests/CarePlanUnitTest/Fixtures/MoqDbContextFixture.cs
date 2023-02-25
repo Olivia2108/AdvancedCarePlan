@@ -63,7 +63,7 @@ namespace CarePlanUnitTest.Fixtures
 
 
             mockDbContext
-                .Setup(o => o.PatientCarePlan)
+                .Setup(o => o.Set<PatientCarePlan>())
                 .Returns(() => mockSet.Object);
 
 

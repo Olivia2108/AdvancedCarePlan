@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace Application.Common.Interfaces.IRepository
 {
     public interface IPatientCarePlanRepository
     {
+        Task<long> AddPatientCarePlan(PatientCarePlan data);
+        Task<bool> IsUsernameExist(string username);
     }
 }

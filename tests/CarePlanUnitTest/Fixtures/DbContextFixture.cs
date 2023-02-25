@@ -1,4 +1,5 @@
 ﻿
+using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -33,7 +34,7 @@ namespace CarePlanUnitTest.Fixtures
 
             foreach (var plan in stub)
             {
-                context.PatientCarePlan.AddAsync(plan);
+                context.Set<PatientCarePlan>().AddAsync(plan);
             }
 
 

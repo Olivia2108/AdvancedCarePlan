@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.ViewModels
+namespace Application.ViewModels
 {
-    internal class PatientCarePlanVM
+    public class PatientCarePlanVM
     {
     }
 }

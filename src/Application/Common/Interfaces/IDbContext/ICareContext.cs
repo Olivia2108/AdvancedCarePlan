@@ -10,8 +10,7 @@ namespace Application.Common.Interfaces.IDbContext
 {
     public interface ICareContext
     {
-        DbSet<AuditTrail>? AuditLogs { get; set; }
-        DbSet<PatientCarePlan>? PatientCarePlan { get; set; }
+        DbSet<T>? Set<T>() where T : class; 
         Task<int> SaveChangesAsync(string? ipAddress);
     }
 }

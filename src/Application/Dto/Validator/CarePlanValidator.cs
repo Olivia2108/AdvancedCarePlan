@@ -1,10 +1,10 @@
 ﻿using Bogus; 
 using FluentValidation;
 using FluentValidation.Results;
-using Infrastructure.Dto;
+using Application.Dto;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace CareData.Dto.Validator
+namespace Application.Dto.Validator
 {
 	 
 
