@@ -10,15 +10,19 @@ namespace Application.Dto
 	public class PatientCarePlanDto
 	{
 		[StringLength(450)]
-		public string? Title { get; set; }
+        [Required]
+        public string? Title { get; set; }
 
 		[StringLength(450)]
-		public string? UserName { get; set; }
+        [Required]
+        public string? UserName { get; set; }
 
 		[StringLength(450)]
-		public string? PatientName { get; set; } 
+        [Required]
+        public string? PatientName { get; set; } 
 
 		[StringLength(1000)]
+		[Required]
 		public string? Reason { get; set; }
 		public bool Completed { get; set; }
 
@@ -26,10 +30,14 @@ namespace Application.Dto
 		public string? Outcome { get; set; }
 
 		[StringLength(1000)]
-		public string? Action { get; set; }
-		public DateTime TargetStartDate { get; set; }
-		public DateTime ActualStartDate { get; set; }
+        [Required]
+        public string? Action { get; set; }
+        [Required]
+        public DateTime TargetStartDate { get; set; }
+        [Required]
+        public DateTime ActualStartDate { get; set; }
 		public DateTime ActualEndDate { get; set; }
-		public string? IpAddress { get; set; }
+        [Required]
+        public string? IpAddress { get; set; }
 	}
 }

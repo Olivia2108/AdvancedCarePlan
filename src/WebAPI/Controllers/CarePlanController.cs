@@ -27,9 +27,18 @@ namespace WebAPI.Controllers
         {
             try
             {
+                switch (!ModelState.IsValid)
+                {
+                    case true: 
+                        return BadRequest(new ResponseVM
+                        {
+                            Message = ResponseConstants.ModelStateInvalid,
+                            Success = false
+                        });
+                }
 
                 var result = await _carePlanService.AddPatientCarePlan(carePlan);
-                return result.Success ? Ok(result) : BadRequest(result);
+                return result.Success ? CreatedAtRoute("AddPatientCarePlan", result) : BadRequest(result);
 
             }
             catch (Exception ex)
@@ -40,155 +49,190 @@ namespace WebAPI.Controllers
         }
 
 
-        //[HttpGet("GetAllCarePlans")]
-        //[ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
-        //public async Task<IActionResult> GetAllCarePlans()
-        //{
-        //    try
-        //    {
-        //        var result = await _carePlanService.GetAllCarePlans();
-        //        switch (result.Success)
-        //        {
-        //            case false:
-        //                return BadRequest(result);
+        [HttpGet("GetAllPatientCarePlans")]
+        [ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllPatientCarePlans()
+        {
+            try
+            {
+                var result = await _carePlanService.GetAllPatientCarePlans();
+                switch (result.Success)
+                {
+                    case false:
+                        return BadRequest(result);
 
-        //            case true:
-        //                switch (result.Message)
-        //                {
-        //                    case ResponseConstants.NotFound:
-        //                        return NotFound(result);
+                    case true:
+                        switch (result.Message)
+                        {
+                            case ResponseConstants.NotFound:
+                                return NotFound(result);
 
-        //                    case ResponseConstants.Found:
-        //                        return Ok(result);
-        //                }
-        //                break;
-        //        }
+                            case ResponseConstants.Found:
+                                return Ok(result);
+                        }
+                        break;
+                }
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
-        //    }
-        //    return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
-        //}
-
-
-
-        //[HttpGet("GetCarePlanById")]
-        //[ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
-        //public async Task<IActionResult> GetCarePlanById([FromQuery] long carePlanId)
-        //{
-        //    try
-        //    {
-
-        //        switch (!ModelState.IsValid)
-        //        {
-        //            case true:
-        //                return BadRequest(new ResponseVM
-        //                {
-        //                    Message = "",
-        //                    Success = false
-        //                });
-
-        //        }
-
-
-        //        var result = await _carePlanService.GetCarePlanById(carePlanId);
-        //        switch (result.Success)
-        //        {
-        //            case false:
-        //                return BadRequest(result);
-
-        //            case true:
-        //                switch (result.Message)
-        //                {
-        //                    case ResponseConstants.NotFound:
-        //                        return NotFound(result);
-
-        //                    case ResponseConstants.Found:
-        //                        return Ok(result);
-        //                }
-        //                break;
-        //        }
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
-        //    }
-        //    return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
-        //}
+            }
+            catch (Exception ex)
+            {
+                LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
+            }
+            return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
+        }
 
 
 
+        [HttpGet("GetCarePlanById")]
+        [ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetCarePlanById([FromQuery] long carePlanId)
+        {
+            try
+            {
 
-        //[HttpPut("UpdateCarePlanById")]
-        //[ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
-        //public async Task<IActionResult> UpdateCarePlanById([FromBody] PatientCarePlanDto carePlan, [FromQuery] long carePlanId)
-        //{
-        //    try
-        //    {
-        //        var result = await _carePlanService.UpdateCarePlanById(carePlan, carePlanId);
-        //        switch (result.Success)
-        //        {
-        //            case false:
-        //                return BadRequest(result);
+                switch (carePlanId)
+                {
+                    case 0:
+                    case <0:
+                        return BadRequest(new ResponseVM
+                        {
+                            Message = ResponseConstants.InvalidId,
+                            Success = false
+                        });
 
-        //            case true:
-        //                switch (result.Message)
-        //                {
-        //                    case ResponseConstants.NotFound:
-        //                        return NotFound(result);
-
-        //                    case ResponseConstants.Updated:
-        //                        return Ok(result);
-        //                }
-        //                break;
-        //        }
+                }
 
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
-        //    }
-        //    return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
-        //}
+                var result = await _carePlanService.GetCarePlanById(carePlanId);
+                switch (result.Success)
+                {
+                    case false:
+                        return BadRequest(result);
+
+                    case true:
+                        switch (result.Message)
+                        {
+                            case ResponseConstants.NotFound:
+                                return NotFound(result);
+
+                            case ResponseConstants.Found:
+                                return Ok(result);
+                        }
+                        break;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
+            }
+            return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
+        }
 
 
 
-        //[HttpDelete("DeleteCarePlanById")]
-        //[ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
-        //public async Task<IActionResult> DeleteCarePlanById([FromQuery] long carePlanId, [FromQuery] string ipAddress)
-        //{
-        //    try
-        //    {
-        //        var result = await _carePlanService.DeleteCarePlanById(carePlanId, ipAddress);
-        //        switch (result.Success)
-        //        {
-        //            case false:
-        //                return BadRequest(result);
 
-        //            case true:
-        //                switch (result.Message)
-        //                {
-        //                    case ResponseConstants.NotDeleted:
-        //                        return NotFound(result);
+        [HttpPut("UpdateCarePlanById")]
+        [ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateCarePlanById([FromBody] PatientCarePlanDto carePlan, [FromQuery] long carePlanId)
+        {
+            try
+            {
+                switch (carePlanId)
+                {
+                    case 0:
+                    case < 0:
+                        return BadRequest(new ResponseVM
+                        {
+                            Message = ResponseConstants.InvalidId,
+                            Success = false
+                        });
 
-        //                    case ResponseConstants.Deleted:
-        //                        return Ok(result);
-        //                }
-        //                break;
-        //        }
+                }
+                switch (!ModelState.IsValid)
+                {
+                    case true:
+                        return BadRequest(new ResponseVM
+                        {
+                            Message = ResponseConstants.ModelStateInvalid,
+                            Success = false
+                        });
+                }
 
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
-        //    }
+                var result = await _carePlanService.UpdateCarePlanById(carePlan, carePlanId);
+                switch (result.Success)
+                {
+                    case false:
+                        return BadRequest(result);
 
-        //    return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
-        //}
+                    case true:
+                        switch (result.Message)
+                        {
+                            case ResponseConstants.NotFound:
+                                return NotFound(result);
+
+                            case ResponseConstants.Updated:
+                                return Ok(result);
+                        }
+                        break;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
+            }
+            return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
+        }
+
+
+
+        [HttpDelete("DeleteCarePlanById")]
+        [ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteCarePlanById([FromQuery] long carePlanId, [FromQuery] string ipAddress)
+        {
+            try
+            {
+                switch (carePlanId)
+                {
+                    case 0:
+                    case < 0:
+                        return BadRequest(new ResponseVM
+                        {
+                            Message = ResponseConstants.InvalidId,
+                            Success = false
+                        });
+
+                }
+
+                var result = await _carePlanService.DeleteCarePlanById(carePlanId, ipAddress);
+                switch (result.Success)
+                {
+                    case false:
+                        return BadRequest(result);
+
+                    case true:
+                        switch (result.Message)
+                        {
+                            case ResponseConstants.NotDeleted:
+                                return NotFound(result);
+
+                            case ResponseConstants.Deleted:
+                                return Ok(result);
+                        }
+                        break;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
+            }
+
+            return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
+        }
     }
 }

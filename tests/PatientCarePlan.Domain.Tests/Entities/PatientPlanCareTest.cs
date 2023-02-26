@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarePlanUnitTest.System.Controller.PatientCarePlan.Actions
+namespace PatientCarePlan.Domain.Tests.Entities
 {
-    internal class GetAction
+    public class PatientPlanCareTest
     {
     }
 }

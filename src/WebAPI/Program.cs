@@ -1,7 +1,9 @@
 
-using Application.Common.RegisterServices;
+using Application.Common.Interfaces.IDbContext; 
+using AutoMapper;
 using Domain.Exceptions;
 using Infrastructure.Persistence;
+using Infrastructure.RegisterServices; 
 using Microsoft.EntityFrameworkCore;
 using NLog;
 
@@ -39,8 +41,11 @@ namespace WebAPI
 				// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 				builder.Services.AddEndpointsApiExplorer();
 
-				builder.Services.AddRepositoryDependency(Configuration);
+				builder.Services.AddDependency(Configuration);
 
+                builder.Services.AddHttpContextAccessor();
+
+                builder.Services.AddAutoMapper(typeof(Program));
 
                 var env = Configuration.GetValue<string>("Env:docker");
 				string connectionString = string.Empty;
@@ -61,10 +66,12 @@ namespace WebAPI
 					options.UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(CareContext).Assembly.FullName)); 
 				});
 
+                builder.Services.AddScoped<ICareContext>(provider => provider.GetService<CareContext>());
 
 
-				//Call the Program DI class
-				ConfigureDiServices(builder.Services);
+
+                //Call the Program DI class
+                ConfigureDiServices(builder.Services);
 
 
 				var app = builder.Build();

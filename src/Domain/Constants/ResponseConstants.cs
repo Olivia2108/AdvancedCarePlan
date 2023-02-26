@@ -8,6 +8,8 @@ namespace Domain.Constants
 {
 	public class ResponseConstants
 	{
+		public const string InvalidId = "Invalid Id provided";
+		public const string ModelStateInvalid = "Model State is Invalid";
 		public const string NotFound = "No record was found";
 		public const string Found = "Records returned";
 		public const string Saved = "Record saved successfully";
