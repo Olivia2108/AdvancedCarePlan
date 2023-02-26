@@ -30,7 +30,7 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PatientCarePlan",
+                name: "PatientCarePlans",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -46,7 +46,9 @@ namespace Infrastructure.Migrations
                     ActualStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ActualEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateModified = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DateDeleted = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -54,7 +56,7 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PatientCarePlan", x => x.Id);
+                    table.PrimaryKey("PK_PatientCarePlans", x => x.Id);
                 });
         }
 
@@ -64,7 +66,7 @@ namespace Infrastructure.Migrations
                 name: "AuditLogs");
 
             migrationBuilder.DropTable(
-                name: "PatientCarePlan");
+                name: "PatientCarePlans");
         }
     }
 }

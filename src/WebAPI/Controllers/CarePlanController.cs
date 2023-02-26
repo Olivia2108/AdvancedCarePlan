@@ -40,37 +40,37 @@ namespace WebAPI.Controllers
         }
 
 
-        //[HttpGet("GetAllCarePlans")]
-        //[ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
-        //public async Task<IActionResult> GetAllCarePlans()
-        //{
-        //    try
-        //    {
-        //        var result = await _carePlanService.GetAllCarePlans();
-        //        switch (result.Success)
-        //        {
-        //            case false:
-        //                return BadRequest(result);
+        [HttpGet("GetAllPatientCarePlans")]
+        [ProducesResponseType(typeof(ResponseVM), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllPatientCarePlans()
+        {
+            try
+            {
+                var result = await _carePlanService.GetAllPatientCarePlans();
+                switch (result.Success)
+                {
+                    case false:
+                        return BadRequest(result);
 
-        //            case true:
-        //                switch (result.Message)
-        //                {
-        //                    case ResponseConstants.NotFound:
-        //                        return NotFound(result);
+                    case true:
+                        switch (result.Message)
+                        {
+                            case ResponseConstants.NotFound:
+                                return NotFound(result);
 
-        //                    case ResponseConstants.Found:
-        //                        return Ok(result);
-        //                }
-        //                break;
-        //        }
+                            case ResponseConstants.Found:
+                                return Ok(result);
+                        }
+                        break;
+                }
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
-        //    }
-        //    return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
-        //}
+            }
+            catch (Exception ex)
+            {
+                LoggerMiddleware.LogError($"{ex.Message}  : with stack trace......  {ex.StackTrace}");
+            }
+            return BadRequest(new ResponseVM { Message = ErrorConstants.Error });
+        }
 
 
 

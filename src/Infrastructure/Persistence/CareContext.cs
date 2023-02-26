@@ -20,8 +20,9 @@ namespace Infrastructure.Persistence
 		{
 
 		}
-		 
 
+		public DbSet<PatientCarePlan>? PatientCarePlans { get; set; }
+		public DbSet<AuditTrail>? AuditLogs { get; set; }
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			if (!optionsBuilder.IsConfigured)
@@ -136,7 +137,7 @@ namespace Infrastructure.Persistence
 			}
 			foreach (var auditEntry in auditEntries)
             {
-                base.Set<AuditTrail>()?.Add(auditEntry.ToAudit());
+                AuditLogs?.Add(auditEntry.ToAudit()); 
 				 
 			}
 		}

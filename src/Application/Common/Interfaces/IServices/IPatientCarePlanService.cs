@@ -11,5 +11,6 @@ namespace Application.Common.Interfaces.IServices
     public interface IPatientCarePlanService
     {
         Task<ResponseVM> AddPatientCarePlan(PatientCarePlanDto carePlanDto);
+        Task<ResponseVM> GetAllPatientCarePlans();
     }
 }

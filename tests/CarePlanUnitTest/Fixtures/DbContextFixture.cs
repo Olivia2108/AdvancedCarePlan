@@ -1,10 +1,15 @@
 ﻿
+using Application.Common.Interfaces.IRepository;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using MockQueryable.Moq;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,7 +24,7 @@ namespace CarePlanUnitTest.Fixtures
             _context = new CareContext(options);
 
             _context.Database.EnsureCreated();
-            Seed(_context);
+            Seed(_context).GetAwaiter().GetResult();
         }
 
         public void Dispose()
@@ -28,18 +33,20 @@ namespace CarePlanUnitTest.Fixtures
             _context.Dispose();
         }
 
-        private void Seed(CareContext context)
+        private async Task Seed(CareContext context)
         {
             var stub = DbInitializer.GenerateData(10);
 
             foreach (var plan in stub)
             {
-                context.Set<PatientCarePlan>().AddAsync(plan);
+                await context.Set<PatientCarePlan>().AddAsync(plan);
             }
+             
 
-
-
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
+
+         
+
     }
 }

@@ -34,10 +34,11 @@ namespace Infrastructure.Persistence
         {
             var stub = GenerateData(10);
 
-            foreach (var employee in stub)
-            {
-                context.Set<PatientCarePlan>().AddAsync(employee);
-            }
+            //foreach (var carePlan in stub)
+            //{
+            //    context.Set<PatientCarePlan>().AddAsync(carePlan);
+            //}
+            context.Set<PatientCarePlan>().AddRangeAsync(stub);
 
             var ty = context.SaveChangesAsync(stub.FirstOrDefault().IpAddress).GetAwaiter().GetResult();
         }
@@ -105,7 +106,9 @@ namespace Infrastructure.Persistence
                 .RuleFor(c => c.IpAddress, f => f.Internet.IpAddress().ToString())
                 .RuleFor(c => c.DateCreated, f => f.Date.Recent(5))
                 .RuleFor(c => c.TargetStartDate, f => f.Date.Recent(3))
-                .RuleFor(c => c.ActualStartDate, f => f.Date.Soon(5));
+                .RuleFor(c => c.ActualStartDate, f => f.Date.Soon(5))
+                .RuleFor(c => c.CreatedBy, f => f.Person.FirstName);
+                //.RuleFor(c => c.ModifiedBy, f => f.Person.LastName);
 
 
             var random = new Random();
@@ -124,6 +127,7 @@ namespace Infrastructure.Persistence
 
         }
 
+         
 
         public static int GiveMeANumber(List<PatientCarePlan> patients)
         {
@@ -135,6 +139,17 @@ namespace Infrastructure.Persistence
             var rand = new Random();
             int index = rand.Next(0, 100 - exclude.Count);
             return range.ElementAt(index);
+        }
+
+        public static string GenereateRandomAlphaNumeric(int length)
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            var result = new string(
+                Enumerable.Repeat(chars, length)
+                          .Select(s => s[random.Next(s.Length)])
+                          .ToArray());
+            return result;
         }
     }
 

@@ -83,6 +83,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -94,9 +98,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeviceChannel")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("IpAddress")
                         .HasColumnType("nvarchar(max)");
 
@@ -107,6 +108,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Outcome")
                         .HasMaxLength(1000)
@@ -137,7 +141,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PatientCarePlan");
+                    b.ToTable("PatientCarePlans");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,9 @@
 ﻿using Application.Common.Interfaces.IDbContext;
 using Application.Common.Interfaces.IRepository;
+using Application.Mapping;
+using Application.ViewModels;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain.Entities;
 using Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +18,11 @@ namespace Infrastructure.Repository
 {
     public class PatientCarePlanRepository : IPatientCarePlanRepository
     {
-        private readonly ICareContext _context;
+        private readonly ICareContext _context; 
 
         public PatientCarePlanRepository(ICareContext context)
         {
-            _context = context;
+            _context = context; 
         }
 
 
@@ -44,7 +48,7 @@ namespace Infrastructure.Repository
         {
             try
             {
-                var patient = await _context.Set<PatientCarePlan>().Where(x => x.UserName == username).FirstOrDefaultAsync();
+                var patient = await _context.Set<PatientCarePlan>().Where(x => x.UserName == username).AsNoTracking().FirstOrDefaultAsync();
                 switch (patient)
                 {
                     case null:
@@ -61,6 +65,45 @@ namespace Infrastructure.Repository
                 return false;
             }
         }
+
+
+
+        public async Task<List<PatientCarePlanVM>> GetAllPatientCarePlans()
+        {
+            try
+            {  
+                var records = await _context.Set<PatientCarePlan>()
+                                    .Where(x => x.IsActive && !x.IsDeleted)
+                                    .OrderByDescending(x => x.DateCreated)
+                                    .Select(x => new PatientCarePlanVM
+                                    {
+                                        UserName = x.UserName,
+                                        PatientName = x.PatientName,
+                                        ActualStartDate = x.ActualStartDate,
+                                        ActualEndDate = x.ActualEndDate,
+                                        TargetStartDate = x.TargetStartDate,
+                                        Action = x.Action,
+                                        Reason = x.Reason,
+                                        Outcome = x.Outcome,
+                                        Title= x.Title,
+                                        Id= x.Id,
+                                        DateCreated = x.DateCreated,
+
+                                    })
+                                    .AsNoTracking()
+                                    .ToListAsync();
+                  
+                return records;
+            }
+            catch (Exception ex)
+            {
+                LoggerMiddleware.LogError(ex.Message);
+                return new List<PatientCarePlanVM>();
+            }
+        }
+
+
+
 
     }
 }

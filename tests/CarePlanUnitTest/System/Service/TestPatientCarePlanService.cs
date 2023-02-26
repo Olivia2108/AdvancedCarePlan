@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarePlanUnitTest.System.Controller.PatientCarePlan.Actions
+namespace CarePlanUnitTest.System.Service
 {
-    internal class UpdateAction
+    public class TestPatientCarePlanService
     {
     }
 }

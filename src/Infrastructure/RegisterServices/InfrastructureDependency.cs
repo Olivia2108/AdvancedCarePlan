@@ -3,11 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Application.Common.RegisterServices
+namespace Infrastructure.RegisterServices
 {
-	public static class AppDependency
+	public static class InfrastructureDependency
 	{
-		public static IServiceCollection AddRepositoryDependency(this IServiceCollection services, IConfiguration? configuration)
+		public static IServiceCollection AddDependency(this IServiceCollection services, IConfiguration? configuration)
 		{
 
 			 
@@ -31,7 +31,7 @@ namespace Application.Common.RegisterServices
 					.WithScopedLifetime();
 			});
 
-			services.AddAutoMapper(typeof(AppDependency));
+			services.AddAutoMapper(typeof(InfrastructureDependency));
 			return services;
 
 

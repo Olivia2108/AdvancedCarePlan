@@ -56,11 +56,11 @@ namespace Infrastructure.Services
                     PatientName = carePlanDto.PatientName,
                     UserName = carePlanDto.UserName,
                     Action = carePlanDto.Action,
-                    ActualEndDate = carePlanDto.ActualEndDate,
+                    ActualEndDate = carePlanDto.Completed ? carePlanDto.ActualEndDate: Convert.ToDateTime("0001-01-01 00:00:00.0000000"),
                     ActualStartDate = carePlanDto.ActualStartDate,
                     TargetStartDate = carePlanDto.TargetStartDate,
                     Completed = carePlanDto.Completed,
-                    Outcome = carePlanDto.Outcome,
+                    Outcome = carePlanDto.Completed ? carePlanDto.Outcome: "",
                     Reason = carePlanDto.Reason,
                     Title = carePlanDto.Title,
                     IpAddress = carePlanDto.IpAddress
@@ -97,6 +97,41 @@ namespace Infrastructure.Services
 
             }
         }
+
+
+
+        public async Task<ResponseVM> GetAllPatientCarePlans()
+        {
+            try
+            {
+                var result = await _repository.GetAllPatientCarePlans();
+                return result.Count > 0 ?
+                    new ResponseVM
+                    {
+                        Data = result,
+                        Message = ResponseConstants.Found,
+                        Success = true,
+                    }
+
+                    :
+                    new ResponseVM
+                    {
+                        Message = ResponseConstants.NotFound,
+                        Success = true
+                    };
+
+            }
+            catch (Exception ex)
+            {
+                LoggerMiddleware.LogError(ex.Message);
+                return new ResponseVM
+                {
+                    Message = ErrorConstants.ServiceFetchError,
+                    Success = false
+                }; ;
+            }
+        }
+
 
 
     }
