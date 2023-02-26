@@ -52,7 +52,7 @@ namespace Infrastructure.Services
                 }
 
 
-                var data = new PatientCarePlan
+                var data = new PatientCarePlans
                 {
                     PatientName = carePlanDto.PatientName,
                     UserName = carePlanDto.UserName,
@@ -193,7 +193,7 @@ namespace Infrastructure.Services
 
 
 
-                var data = new PatientCarePlan
+                var data = new PatientCarePlans
                 {
                     PatientName = carePlanDto.PatientName,
                     UserName = carePlanDto.UserName,

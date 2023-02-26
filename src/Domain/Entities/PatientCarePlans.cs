@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class PatientCarePlan : BaseEntity
+    public class PatientCarePlans : BaseEntity
     { 
          
         public string? Title { get; set; } 

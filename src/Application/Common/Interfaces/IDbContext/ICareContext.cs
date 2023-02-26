@@ -11,7 +11,7 @@ namespace Application.Common.Interfaces.IDbContext
     public interface ICareContext
     {
         DbSet<T>? Set<T>() where T : class;
-        DbSet<PatientCarePlan>? PatientCarePlans { get; set; }
+        DbSet<PatientCarePlans>? PatientCarePlans { get; set; }
         DbSet<AuditTrail>? AuditLogs { get; set; }
 
         Task<int> SaveChangesAsync(string? ipAddress);

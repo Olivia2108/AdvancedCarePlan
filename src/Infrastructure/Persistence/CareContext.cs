@@ -21,7 +21,7 @@ namespace Infrastructure.Persistence
 
 		}
 
-		public DbSet<PatientCarePlan>? PatientCarePlans { get; set; }
+		public DbSet<PatientCarePlans>? PatientCarePlans { get; set; }
 		public DbSet<AuditTrail>? AuditLogs { get; set; }
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -38,7 +38,7 @@ namespace Infrastructure.Persistence
 			if (modelBuilder == null)
 				return;
 
-			modelBuilder.Entity<PatientCarePlan>(entity =>
+			modelBuilder.Entity<PatientCarePlans>(entity =>
 			{
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -79,7 +79,7 @@ namespace Infrastructure.Persistence
 			return result;
 		}
 
-        private string GetModifiedUser()
+		private string GetModifiedUser()
         {
             var name = _accessor?.HttpContext?.User?.Identity?.Name;
             return !string.IsNullOrEmpty(name) ? name : "Anonymous";
@@ -144,7 +144,7 @@ namespace Infrastructure.Persistence
 
 		private void PerformEntityAudit()
 		{
-			foreach (var entry in ChangeTracker.Entries<PatientCarePlan>())
+			foreach (var entry in ChangeTracker.Entries<PatientCarePlans>())
 			{
 				switch (entry.State)
 				{

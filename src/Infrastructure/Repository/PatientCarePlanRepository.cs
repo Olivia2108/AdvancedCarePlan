@@ -1,11 +1,11 @@
 ﻿using Application.Common.Interfaces.IDbContext;
-using Application.Common.Interfaces.IRepository;
-using Application.Mapping;
+using Application.Common.Interfaces.IRepository; 
 using Application.ViewModels;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain.Entities;
 using Domain.Exceptions;
+using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,21 +18,21 @@ namespace Infrastructure.Repository
 {
     public class PatientCarePlanRepository : IPatientCarePlanRepository
     {
-        private readonly ICareContext _context; 
+        private readonly CareContext _context; 
 
-        public PatientCarePlanRepository(ICareContext context)
+        public PatientCarePlanRepository(CareContext context)
         {
             _context = context; 
         }
 
 
 
-        public async Task<long> AddPatientCarePlan(PatientCarePlan data)
+        public async Task<long> AddPatientCarePlan(PatientCarePlans data)
         {
             //var gh = _context.Database.GetDbConnection().ConnectionString;
             try
             {
-                await _context.Set<PatientCarePlan>().AddAsync(data);
+                await _context.Set<PatientCarePlans>().AddAsync(data);
                 var saves = await _context.SaveChangesAsync(data.IpAddress);
                 return saves;
             }
@@ -48,7 +48,7 @@ namespace Infrastructure.Repository
         {
             try
             {
-                var patient = await _context.Set<PatientCarePlan>().Where(x => x.UserName == username).AsNoTracking().FirstOrDefaultAsync();
+                var patient = await _context.Set<PatientCarePlans>().Where(x => x.UserName == username).AsNoTracking().FirstOrDefaultAsync();
                 switch (patient)
                 {
                     case null:
@@ -72,7 +72,7 @@ namespace Infrastructure.Repository
         {
             try
             {  
-                var records = await _context.Set<PatientCarePlan>()
+                var records = await _context.Set<PatientCarePlans>()
                                     .Where(x => x.IsActive && !x.IsDeleted)
                                     .OrderByDescending(x => x.DateCreated)
                                     .Select(x => new PatientCarePlanVM
@@ -109,7 +109,7 @@ namespace Infrastructure.Repository
         {
             try
             {
-                var records = await _context.Set<PatientCarePlan>()
+                var records = await _context.Set<PatientCarePlans>()
                                     .Where(x => x.Id == carePlanId && x.IsActive && !x.IsDeleted) 
                                     .Select(x => new PatientCarePlanVM
                                     {
@@ -138,11 +138,13 @@ namespace Infrastructure.Repository
         }
 
 
-        public async Task<int> UpdateCarePlanById(long carePlanId, PatientCarePlan data)
+        public async Task<int> UpdateCarePlanById(long carePlanId, PatientCarePlans data)
         {
             try
             {
-                var record = await _context.Set<PatientCarePlan>().Where(x => x.Id == carePlanId).FirstOrDefaultAsync();
+                
+
+                var record = await _context.Set<PatientCarePlans>().Where(x => x.Id == carePlanId).FirstOrDefaultAsync();
                 switch (record == null)
                 {
                     case true:
@@ -177,7 +179,7 @@ namespace Infrastructure.Repository
         {
             try
             {
-                var emply = await _context.Set<PatientCarePlan>().Where(x => x.Id == carePlanId).FirstOrDefaultAsync();
+                var emply = await _context.Set<PatientCarePlans>().Where(x => x.Id == carePlanId).FirstOrDefaultAsync();
                 switch (emply == null)
                 {
                     case true:

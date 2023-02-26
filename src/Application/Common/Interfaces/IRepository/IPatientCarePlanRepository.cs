@@ -10,11 +10,11 @@ namespace Application.Common.Interfaces.IRepository
 {
     public interface IPatientCarePlanRepository
     {
-        Task<long> AddPatientCarePlan(PatientCarePlan data);
+        Task<long> AddPatientCarePlan(PatientCarePlans data);
         Task<bool> IsUsernameExist(string username);
         Task<List<PatientCarePlanVM>> GetAllPatientCarePlans();
         Task<PatientCarePlanVM> GetCarePlanById(long carePlanId);
-        Task<int> UpdateCarePlanById(long carePlanId, PatientCarePlan data);
+        Task<int> UpdateCarePlanById(long carePlanId, PatientCarePlans data);
         Task<int> DeleteCarePlanById(long carePlanId, string ipAddress);
     }
 }

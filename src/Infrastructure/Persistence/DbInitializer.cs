@@ -18,7 +18,7 @@ namespace Infrastructure.Persistence
         {
             context.Database.Migrate();
 
-            if (context.Set<PatientCarePlan>().Any())
+            if (context.Set<PatientCarePlans>().Any())
             {
                 LoggerMiddleware.LogInfo("Plan exist");
             }
@@ -33,17 +33,13 @@ namespace Infrastructure.Persistence
         private static void Seed(CareContext context)
         {
             var stub = GenerateData(10);
-
-            //foreach (var carePlan in stub)
-            //{
-            //    context.Set<PatientCarePlan>().AddAsync(carePlan);
-            //}
-            context.Set<PatientCarePlan>().AddRangeAsync(stub);
+             
+            context.Set<PatientCarePlans>().AddRangeAsync(stub);
 
             var ty = context.SaveChangesAsync(stub.FirstOrDefault().IpAddress).GetAwaiter().GetResult();
         }
 
-        public static List<PatientCarePlan> GenerateData(int count)
+        public static List<PatientCarePlans> GenerateData(int count)
         {
             var titles = new string[] {
                 nameof(Titles.Sir),
@@ -95,7 +91,7 @@ namespace Infrastructure.Persistence
                 false,
             };
 
-            var faker = new Faker<PatientCarePlan>()
+            var faker = new Faker<PatientCarePlans>()
                 .RuleFor(c => c.Title, f => f.PickRandom(titles))
                 .RuleFor(c => c.PatientName, f => f.Person.FullName)
                 .RuleFor(c => c.UserName, f => f.Person.UserName)
@@ -129,7 +125,7 @@ namespace Infrastructure.Persistence
 
          
 
-        public static int GiveMeANumber(List<PatientCarePlan> patients)
+        public static int GiveMeANumber(List<PatientCarePlans> patients)
         {
             List<long> IdList = patients.Select(person => person.Id).ToList();
             var myArray = IdList.ToArray();

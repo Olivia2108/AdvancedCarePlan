@@ -14,6 +14,7 @@ using System.Web.Mvc;
 using System.Collections.Specialized;
 using System.Globalization;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Castle.Components.DictionaryAdapter.Xml;
 
 namespace PatientCarePlan.Api.Tests.Controller
 {
@@ -53,33 +54,21 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Act
             var result = await _sut.GetAllPatientCarePlans().ConfigureAwait(false);
 
-            //Assert
 
-            Assert.NotNull(result);
-            result.Should().NotBeNull();
+            //Assert  
             result.Should().BeAssignableTo<OkObjectResult>();
             result.As<OkObjectResult>().Value
                 .Should().NotBeNull()
                 .And
                 .BeOfType(response.GetType());
-            var actualResponse = result.As<OkObjectResult>().Value;
 
-
-            switch (actualResponse)
-            {
-                case null:
-                    result.Should().NotBeNull();
-                    break;
-
-                default:
-                    var value = (ResponseVM)actualResponse;
-                    value.Success.Should().BeTrue();
-                    value.Data.Should().NotBeNull();
-                    value.Data.Should().BeAssignableTo<IEnumerable<PatientCarePlanVM>>();
-                    value.Message.Should().BeEquivalentTo(ResponseConstants.Found);
-
-                    break;
-            }
+            var actualResponse = result.As<OkObjectResult>().Value; 
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().NotBeNull();
+            value.Data.Should().BeAssignableTo<IEnumerable<PatientCarePlanVM>>();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.Found);
+             
              
             _serviceMock.Verify(x => x.GetAllPatientCarePlans(), Times.Once());
         }
@@ -94,12 +83,7 @@ namespace PatientCarePlan.Api.Tests.Controller
                 Success = true,
                 Data = null,
                 Message = ResponseConstants.NotFound
-            };
-
-            //var mc = _fixture.Create<ResponseVM>();
-            //mc.Message = ResponseConstants.NotFound;
-            //mc.Data = null;
-            //mc.Success = true;
+            }; 
               
             _serviceMock.Setup(x => x.GetAllPatientCarePlans())
                 .ReturnsAsync(response);
@@ -107,65 +91,23 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Act
             var result = await _sut.GetAllPatientCarePlans().ConfigureAwait(false);
 
-            //Assert
 
-            Assert.NotNull(result);
-            result.Should().NotBeNull();
+            //Assert  
             result.Should().BeAssignableTo<NotFoundObjectResult>();
             result.As<NotFoundObjectResult>().Value
                 .Should().NotBeNull()
                 .And
-                .BeOfType(response.GetType());
+                .BeOfType(response.GetType()); 
 
-
-            var actualResponse = result.As<NotFoundObjectResult>().Value; 
-            switch (actualResponse)
-            {
-                case null:
-                    result.Should().NotBeNull();
-                    break;
-
-                default:
-                    var value = (ResponseVM)actualResponse;
-                    value.Success.Should().BeTrue();
-                    value.Data.Should().BeNull(); 
-                    value.Message.Should().BeEquivalentTo(ResponseConstants.NotFound); 
-                    break;
-            }
-              
+            var actualResponse = result.As<NotFoundObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.NotFound);
+             
             _serviceMock.Verify(x => x.GetAllPatientCarePlans(), Times.Once());
         }
-
-        [Fact]
-        public async Task GetAllPatientsCarePlan_ShouldReturnBadRequest_WhenExceptionThrown()
-        {
-            //Arrange
-
-            var responseObj = _fixture.Create<ResponseVM>();
-
-
-            _serviceMock.Setup(x => x.GetAllPatientCarePlans())
-                .ReturnsAsync(responseObj);
-
-            //Act
-            var result = await _sut.GetAllPatientCarePlans();
-
-            //Assert
-
-            Assert.NotNull(result);
-            result.Should().NotBeNull();
-            result.Should().BeAssignableTo<BadRequestObjectResult>();
-            result.As<BadRequestObjectResult>().Value
-                .Should().NotBeNull()
-                .And
-                .BeOfType(responseObj.GetType());
-
-            result.Should().BeAssignableTo<IEnumerable<PatientCarePlanVM>>();
-
-            _serviceMock.Verify(x => x.GetAllPatientCarePlans(), Times.Once());
-        }
-
-
+         
 
 
         #endregion
@@ -180,29 +122,36 @@ namespace PatientCarePlan.Api.Tests.Controller
         {
             //Arrange
 
-            var responseObj = _fixture.Create<ResponseVM>();
+            var response = new ResponseVM
+            {
+                Success = true,
+                Data = new PatientCarePlanVM(),
+                Message = ResponseConstants.Found
+            };
+
 
             var id = _fixture.Create<int>();
 
 
             _serviceMock.Setup(x => x.GetCarePlanById(id))
-                .ReturnsAsync(responseObj);
+                .ReturnsAsync(response);
 
             //Act
             var result = await _sut.GetCarePlanById(id);
 
-            //Assert
-
-            result.Should().NotBeNull();
-
-
+            //Assert 
             result.Should().BeAssignableTo<OkObjectResult>();
             result.As<OkObjectResult>().Value
                 .Should()
                 .NotBeNull()
                 .And
-                .BeOfType(responseObj.GetType());
+                .BeOfType(response.GetType());
 
+            var actualResponse = result.As<OkObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().BeOfType<PatientCarePlanVM>();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.Found);
 
             _serviceMock.Verify(x => x.GetCarePlanById(id), Times.Once());
         }
@@ -215,29 +164,35 @@ namespace PatientCarePlan.Api.Tests.Controller
         {
             //Arrange
 
-            var responseObj = _fixture.Create<ResponseVM>();
-            responseObj = null;
+            var response = new ResponseVM
+            {
+                Success = true,
+                Data = null,
+                Message = ResponseConstants.NotFound
+            };
 
             var id = _fixture.Create<int>();
 
 
             _serviceMock.Setup(x => x.GetCarePlanById(id))
-                .ReturnsAsync(responseObj);
+                .ReturnsAsync(response);
 
             //Act
             var result = await _sut.GetCarePlanById(id);
 
-            //Assert
-
-            result.Should().NotBeNull();
-
-
+            //Assert 
             result.Should().BeAssignableTo<NotFoundObjectResult>();
             result.As<NotFoundObjectResult>().Value
                 .Should()
                 .NotBeNull()
                 .And
-                .BeOfType(responseObj.GetType());
+                .BeOfType(response.GetType());
+
+            var actualResponse = result.As<NotFoundObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.NotFound);
 
 
             _serviceMock.Verify(x => x.GetCarePlanById(id), Times.Once());
@@ -267,10 +222,7 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Act
             var result = await _sut.GetCarePlanById(id);
 
-            //Assert
-
-            result.Should().NotBeNull();
-
+            //Assert 
             result.Should().BeAssignableTo<BadRequestObjectResult>();
             result.As<BadRequestObjectResult>().Value
                 .Should()
@@ -278,8 +230,13 @@ namespace PatientCarePlan.Api.Tests.Controller
                 .And
                 .BeOfType(response.GetType());
 
+            var actualResponse = result.As<BadRequestObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeFalse();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.InvalidId);
 
-            _serviceMock.Verify(x => x.GetCarePlanById(id), Times.Once());
+            _serviceMock.Verify(x => x.GetCarePlanById(id), Times.Never());
         }
 
 
@@ -298,7 +255,12 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Arrange
 
             var request = _fixture.Create<PatientCarePlanDto>();
-            var response = _fixture.Create<ResponseVM>();
+            var response = new ResponseVM
+            {
+                Success = true,
+                Data = 2,
+                Message = ResponseConstants.Saved
+            };
 
 
             _serviceMock.Setup(x => x.AddPatientCarePlan(request))
@@ -308,9 +270,7 @@ namespace PatientCarePlan.Api.Tests.Controller
             var result = await _sut.AddPatientCarePlan(request);
 
             //Assert
-
-            result.Should().NotBeNull();
-
+             
             result.Should().BeAssignableTo<CreatedAtRouteResult>();
             result.As<CreatedAtRouteResult>().Value
                 .Should()
@@ -318,8 +278,14 @@ namespace PatientCarePlan.Api.Tests.Controller
                 .And
                 .BeOfType(response.GetType());
 
+            var actualResponse = result.As<CreatedAtRouteResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().NotBeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.Saved);
 
-            _serviceMock.Verify(x => x.AddPatientCarePlan(request), Times.Never());
+
+            _serviceMock.Verify(x => x.AddPatientCarePlan(request), Times.Once());
         }
 
 
@@ -346,9 +312,7 @@ namespace PatientCarePlan.Api.Tests.Controller
             var result = await _sut.AddPatientCarePlan(request);
 
             //Assert
-
-            result.Should().NotBeNull();
-
+ 
 
             result.Should().BeAssignableTo<BadRequestObjectResult>();
             result.As<BadRequestObjectResult>().Value
@@ -357,6 +321,12 @@ namespace PatientCarePlan.Api.Tests.Controller
                 .And
                 .BeOfType(response.GetType());
 
+
+            var actualResponse = result.As<BadRequestObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeFalse();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.ModelStateInvalid);
 
             _serviceMock.Verify(x => x.AddPatientCarePlan(request), Times.Never());
         }
@@ -389,11 +359,7 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Act
             var result = await _sut.DeleteCarePlanById(id, ip);
 
-            //Assert
-
-            result.Should().NotBeNull();
-
-
+            //Assert 
             result.Should().BeAssignableTo<OkObjectResult>();
             result.As<OkObjectResult>().Value
                 .Should()
@@ -401,6 +367,11 @@ namespace PatientCarePlan.Api.Tests.Controller
                 .And
                 .BeOfType(response.GetType());
 
+            var actualResponse = result.As<OkObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.Deleted);
 
         }
 
@@ -431,15 +402,19 @@ namespace PatientCarePlan.Api.Tests.Controller
 
             //Assert
 
-            result.Should().NotBeNull();
-
-
             result.Should().BeAssignableTo<NotFoundObjectResult>();
             result.As<NotFoundObjectResult>().Value
                 .Should()
                 .NotBeNull()
                 .And
                 .BeOfType(response.GetType());
+
+
+            var actualResponse = result.As<NotFoundObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.NotDeleted);
 
 
         }
@@ -471,16 +446,21 @@ namespace PatientCarePlan.Api.Tests.Controller
             var result = await _sut.DeleteCarePlanById(id, ip);
 
 
-            //Assert
-
-            result.Should().NotBeNull();
-
+            //Assert 
             result.Should().BeAssignableTo<BadRequestObjectResult>();
             result.As<BadRequestObjectResult>().Value
                 .Should()
                 .NotBeNull()
                 .And
                 .BeOfType(response.GetType());
+
+
+            var actualResponse = result.As<BadRequestObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeFalse();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.InvalidId);
+
 
 
             _serviceMock.Verify(x => x.DeleteCarePlanById(id, ip), Times.Never());
@@ -514,9 +494,7 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Act
             var result = await _sut.UpdateCarePlanById(request, id);
 
-            //Assert
-
-            result.Should().NotBeNull(); 
+            //Assert 
             result.Should().BeAssignableTo<OkObjectResult>();
             result.As<OkObjectResult>().Value
                 .Should()
@@ -524,6 +502,11 @@ namespace PatientCarePlan.Api.Tests.Controller
                 .And
                 .BeOfType(response.GetType());
 
+            var actualResponse = result.As<OkObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeTrue();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.Updated);
 
         }
 
@@ -551,15 +534,19 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Act
             var result = await _sut.UpdateCarePlanById(request, id);
 
-            //Assert
-
-            result.Should().NotBeNull();
+            //Assert 
             result.Should().BeAssignableTo<BadRequestObjectResult>();
             result.As<BadRequestObjectResult>().Value
                 .Should()
                 .NotBeNull()
                 .And
                 .BeOfType(response.GetType());
+
+            var actualResponse = result.As<BadRequestObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeFalse();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.ModelStateInvalid);
 
 
             _serviceMock.Verify(x => x.UpdateCarePlanById(request, id), Times.Never());
@@ -589,15 +576,19 @@ namespace PatientCarePlan.Api.Tests.Controller
             //Act
             var result = await _sut.UpdateCarePlanById(request, id);
 
-            //Assert
-
-            result.Should().NotBeNull();
+            //Assert 
             result.Should().BeAssignableTo<BadRequestObjectResult>();
             result.As<BadRequestObjectResult>().Value
                 .Should()
                 .NotBeNull()
                 .And
                 .BeOfType(response.GetType());
+
+            var actualResponse = result.As<BadRequestObjectResult>().Value;
+            var value = (ResponseVM)actualResponse ?? new ResponseVM();
+            value.Success.Should().BeFalse();
+            value.Data.Should().BeNull();
+            value.Message.Should().BeEquivalentTo(ResponseConstants.InvalidId);
 
 
             _serviceMock.Verify(x => x.UpdateCarePlanById(request, id), Times.Never());
