@@ -3,14 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using static Domain.Enums.GeneralEnums;
 using Application.Common.Interfaces.IDbContext;
-using Infrastructure.Dto;
+using Application.Dto;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Persistence
 {
     public class CareContext: DbContext, ICareContext
-	{ 
+	{
 
-		public CareContext()
+        private readonly IHttpContextAccessor _accessor = new HttpContextAccessor();
+        public CareContext()
 		{
 		}
 
@@ -19,10 +21,8 @@ namespace Infrastructure.Persistence
 
 		}
 
-
-		public DbSet<PatientCarePlan>? CarePlan { get; set; }
+		public DbSet<PatientCarePlans>? PatientCarePlans { get; set; }
 		public DbSet<AuditTrail>? AuditLogs { get; set; }
-
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			if (!optionsBuilder.IsConfigured)
@@ -38,29 +38,30 @@ namespace Infrastructure.Persistence
 			if (modelBuilder == null)
 				return;
 
-			modelBuilder.Entity<PatientCarePlan>(entity =>
+			modelBuilder.Entity<PatientCarePlans>(entity =>
 			{
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-				entity.Property(e => e.UserName).HasMaxLength(450);
+				entity.Property(e => e.UserName).HasMaxLength(450).IsRequired();
 
-				entity.Property(e => e.PatientName).HasMaxLength(450);
+				entity.Property(e => e.PatientName).HasMaxLength(450).IsRequired();
 
-				entity.Property(e => e.Title).HasMaxLength(450);
+				entity.Property(e => e.Title).HasMaxLength(450).IsRequired();
 
 				entity.Property(e => e.Outcome).HasMaxLength(1000);
 
-				entity.Property(e => e.Action).HasMaxLength(1000);
+				entity.Property(e => e.Action).HasMaxLength(1000).IsRequired();
 
 				entity.Property(e => e.Completed).HasDefaultValue(false);
 
-				entity.Property(e => e.Reason).HasMaxLength(1000);
+				entity.Property(e => e.Reason).HasMaxLength(1000).IsRequired();
 
 				entity.Property(e => e.IsActive).HasDefaultValue(true);
 
 				entity.Property(e => e.DateCreated).HasDefaultValueSql("getdate()");
 			});
-			
+
+			modelBuilder.ApplyConfigurationsFromAssembly(typeof(CareContext).Assembly);
 
 			base.OnModelCreating(modelBuilder);
 
@@ -78,7 +79,13 @@ namespace Infrastructure.Persistence
 			return result;
 		}
 
-		private void OnBeforeSaveChanges(string? ipAddress = null)
+		private string GetModifiedUser()
+        {
+            var name = _accessor?.HttpContext?.User?.Identity?.Name;
+            return !string.IsNullOrEmpty(name) ? name : "Anonymous";
+        }
+
+        private void OnBeforeSaveChanges(string? ipAddress = null)
 		{
 			ChangeTracker.DetectChanges();
 			var auditEntries = new List<AuditTrailDto>();
@@ -129,14 +136,15 @@ namespace Infrastructure.Persistence
 				}
 			}
 			foreach (var auditEntry in auditEntries)
-			{
-				AuditLogs?.Add(auditEntry.ToAudit());
+            {
+                AuditLogs?.Add(auditEntry.ToAudit()); 
+				 
 			}
 		}
 
 		private void PerformEntityAudit()
 		{
-			foreach (var entry in ChangeTracker.Entries<PatientCarePlan>())
+			foreach (var entry in ChangeTracker.Entries<PatientCarePlans>())
 			{
 				switch (entry.State)
 				{
@@ -145,11 +153,15 @@ namespace Infrastructure.Persistence
 						entry.Entity.DateCreated = currentDateTime;
 						entry.Entity.IsDeleted = false;
 						entry.Entity.IsActive = true;
-						break;
+						entry.Entity.CreatedBy = GetModifiedUser();
+
+                        break;
 
 					case EntityState.Modified:
-						//entry.Entity.IsActive = true;
-						break;
+                        entry.Entity.ModifiedBy = GetModifiedUser();
+                        entry.Entity.DateModified = DateTime.Now;
+                        //entry.Entity.IsActive = true;
+                        break;
 
 					case EntityState.Deleted:
 						entry.State = EntityState.Modified;

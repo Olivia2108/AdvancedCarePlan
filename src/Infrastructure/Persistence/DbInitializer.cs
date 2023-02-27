@@ -18,7 +18,7 @@ namespace Infrastructure.Persistence
         {
             context.Database.Migrate();
 
-            if (context.CarePlan.Any())
+            if (context.Set<PatientCarePlans>().Any())
             {
                 LoggerMiddleware.LogInfo("Plan exist");
             }
@@ -33,16 +33,13 @@ namespace Infrastructure.Persistence
         private static void Seed(CareContext context)
         {
             var stub = GenerateData(10);
-
-            foreach (var employee in stub)
-            {
-                context.CarePlan.AddAsync(employee);
-            }
+             
+            context.Set<PatientCarePlans>().AddRangeAsync(stub);
 
             var ty = context.SaveChangesAsync(stub.FirstOrDefault().IpAddress).GetAwaiter().GetResult();
         }
 
-        public static List<PatientCarePlan> GenerateData(int count)
+        public static List<PatientCarePlans> GenerateData(int count)
         {
             var titles = new string[] {
                 nameof(Titles.Sir),
@@ -94,7 +91,7 @@ namespace Infrastructure.Persistence
                 false,
             };
 
-            var faker = new Faker<PatientCarePlan>()
+            var faker = new Faker<PatientCarePlans>()
                 .RuleFor(c => c.Title, f => f.PickRandom(titles))
                 .RuleFor(c => c.PatientName, f => f.Person.FullName)
                 .RuleFor(c => c.UserName, f => f.Person.UserName)
@@ -105,7 +102,9 @@ namespace Infrastructure.Persistence
                 .RuleFor(c => c.IpAddress, f => f.Internet.IpAddress().ToString())
                 .RuleFor(c => c.DateCreated, f => f.Date.Recent(5))
                 .RuleFor(c => c.TargetStartDate, f => f.Date.Recent(3))
-                .RuleFor(c => c.ActualStartDate, f => f.Date.Soon(5));
+                .RuleFor(c => c.ActualStartDate, f => f.Date.Soon(5))
+                .RuleFor(c => c.CreatedBy, f => f.Person.FirstName);
+                //.RuleFor(c => c.ModifiedBy, f => f.Person.LastName);
 
 
             var random = new Random();
@@ -124,8 +123,9 @@ namespace Infrastructure.Persistence
 
         }
 
+         
 
-        public static int GiveMeANumber(List<PatientCarePlan> patients)
+        public static int GiveMeANumber(List<PatientCarePlans> patients)
         {
             List<long> IdList = patients.Select(person => person.Id).ToList();
             var myArray = IdList.ToArray();
@@ -135,6 +135,17 @@ namespace Infrastructure.Persistence
             var rand = new Random();
             int index = rand.Next(0, 100 - exclude.Count);
             return range.ElementAt(index);
+        }
+
+        public static string GenereateRandomAlphaNumeric(int length)
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            var result = new string(
+                Enumerable.Repeat(chars, length)
+                          .Select(s => s[random.Next(s.Length)])
+                          .ToArray());
+            return result;
         }
     }
 

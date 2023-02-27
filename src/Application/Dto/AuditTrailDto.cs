@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Domain.Enums.GeneralEnums;
 
-namespace Infrastructure.Dto
+namespace Application.Dto
 {
 	public class AuditTrailDto
 	{

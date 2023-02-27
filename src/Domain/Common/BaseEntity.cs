@@ -22,12 +22,13 @@ namespace Domain.Common
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; } 
         public bool IsActive { get; set; } 
+        public string CreatedBy { get; set; } 
         public DateTime DateCreated { get; set; } = DateTime.Now;
+        public string? ModifiedBy { get; set; }
         public DateTime DateModified { get; set; }
         public bool IsDeleted { get; set; } 
         public DateTime DateDeleted { get; set; }
-        public string? IpAddress { get; set; }
-        public string? DeviceChannel { get; set; }
+        public string? IpAddress { get; set; } 
          
     }
 }

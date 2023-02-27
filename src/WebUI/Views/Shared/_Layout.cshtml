@@ -20,13 +20,41 @@
     <link rel="stylesheet" href="~/assets/css/custom.css"> 
     <script src="~/assets/js/page/datatables.js" defer></script>
     <link rel='shortcut icon' type='image/x-icon' href='~/assets/img/favicon.ico' />
-    <link href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css"> 
+    <link href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
 
 </head>
 
 <body>
+    <style>
+        .sweet-success {
+            background-color: #a3dd82;
+        }
+
+            .sweet-success:not([disabled]):hover {
+                background-color: #a3dd82;
+            }
+
+        .sweet-error {
+            background-color: #f27474;
+        }
+
+            .sweet-error:not([disabled]):hover {
+                background-color: #f27474;
+            }
+
+        .wrapper {
+            margin: 60px auto;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1.25em;
+        }
+    </style>
     <div class="loader"></div>
     <div id="app">
         @RenderBody()

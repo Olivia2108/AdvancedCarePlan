@@ -1,6 +1,8 @@
 
 using Domain.Exceptions;
 using NLog;
+using WebUI.Helpers;
+using WebUI.Helpers.Interface;
 
 namespace WebUI
 {
@@ -33,9 +35,12 @@ namespace WebUI
 				// Add services to the container.
 				builder.Services.AddControllersWithViews()
 					.AddRazorRuntimeCompilation();
-				 
+                builder.Services.AddSession();
+                builder.Services.AddScoped<IClientHelper, ClientHelper>();
+                builder.Services.AddHttpContextAccessor();
 
-				var app = builder.Build();
+
+                var app = builder.Build();
 
 				// Configure the HTTP request pipeline.
 				if (!app.Environment.IsDevelopment())
@@ -50,8 +55,9 @@ namespace WebUI
 				app.UseMiddleware<ExceptionMiddleware>();
 				app.UseHttpsRedirection();
 				app.UseStaticFiles();
+                app.UseSession();
 
-				app.UseRouting();
+                app.UseRouting();
 
 				app.UseAuthorization();
                 app.Use(async (context, next) =>

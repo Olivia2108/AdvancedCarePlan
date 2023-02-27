@@ -8,10 +8,12 @@ namespace Domain.Constants
 {
 	public class ResponseConstants
 	{
+		public const string InvalidId = "Invalid Id provided";
+		public const string ModelStateInvalid = "Model State is Invalid";
 		public const string NotFound = "No record was found";
 		public const string Found = "Records returned";
 		public const string Saved = "Record saved successfully";
-		public const string IsExist = "Employee with this email already exist";
+		public const string IsExist = "Patient with this username already exist";
 		public const string NotSaved = "Record was not saved, pls try again later";
 		public const string Updated = "Record was updated successfully";
 		public const string NotUpdated = "Record was not updated, pls try again later";
