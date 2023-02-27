@@ -14,6 +14,7 @@ namespace Domain.Constants
 		public const string Found = "Records returned";
 		public const string Saved = "Record saved successfully";
 		public const string IsExist = "Patient with this username already exist";
+		public const string EndDateInvalid = "Actual End Date must be greater than Actual Start Date";
 		public const string NotSaved = "Record was not saved, pls try again later";
 		public const string Updated = "Record was updated successfully";
 		public const string NotUpdated = "Record was not updated, pls try again later";

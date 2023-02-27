@@ -35,7 +35,7 @@ namespace Infrastructure.Services
                         var errors = valid.Errors.Select(l => l.ErrorMessage).FirstOrDefault(); 
                         if(errors.Contains("Actual End Date"))
                         {
-                            errors = "Actual End Date must be greater than Actual Start Date";
+                            errors = ResponseConstants.EndDateInvalid;
                         }
                         return new ResponseVM
                         {
@@ -190,7 +190,7 @@ namespace Infrastructure.Services
                         var errors = valid.Errors.Select(l => l.ErrorMessage).FirstOrDefault();
                         if (errors.Contains("Actual End Date"))
                         {
-                            errors = "Actual End Date must be greater than Actual Start Date";
+                            errors = ResponseConstants.EndDateInvalid;
                         } 
                         return new ResponseVM
                         {

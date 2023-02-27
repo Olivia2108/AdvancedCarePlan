@@ -39,6 +39,7 @@ namespace Infrastructure.Persistence
             var ty = context.SaveChangesAsync(stub.FirstOrDefault().IpAddress).GetAwaiter().GetResult();
         }
 
+
         public static List<PatientCarePlans> GenerateData(int count)
         {
             var titles = new string[] {

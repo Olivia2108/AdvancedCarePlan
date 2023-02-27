@@ -7,14 +7,17 @@ using Domain.Constants;
 using Domain.Entities;
 using FluentAssertions;
 using Infrastructure.Persistence;
+using Infrastructure.Repository;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 using static Domain.Enums.GeneralEnums;
 
 namespace PatientCarePlan.Infrastructure.Tests.Services
@@ -22,17 +25,29 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
     public class PatientCarePlanServiceTest
     {
         private readonly IFixture _fixture;
-        private readonly Mock<IPatientCarePlanRepository> _repositoryMock;
-        private readonly PatientCarePlanService _sut;
+        private readonly Mock<IPatientCarePlanRepository> _repositoryMock; 
+        private readonly PatientCarePlanService _sut; 
+        private readonly PatientCarePlanDto _modelWithCompletedSetToTrue; 
 
         public PatientCarePlanServiceTest()
         {
             _fixture = new Fixture();
             _repositoryMock = _fixture.Freeze<Mock<IPatientCarePlanRepository>>();
-            _sut = new PatientCarePlanService(_repositoryMock.Object);
+            _sut = new PatientCarePlanService(_repositoryMock.Object); 
+            var th =  DbInitializer.GenerateData(100);
+
+            switch (_modelWithCompletedSetToTrue)
+            {
+                case var model when model == null:
+
+                    var json = JsonConvert.SerializeObject(th.Where(x => x.Completed).FirstOrDefault());
+                    _modelWithCompletedSetToTrue = JsonConvert.DeserializeObject<PatientCarePlanDto>(json);
+
+                    break;
+            }
         }
 
-         
+
 
 
         #region GetAll
@@ -42,16 +57,16 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
         [Fact]
         public async Task GetAllPatientsCarePlan_ShouldReturnData_WhenDataFound()
         {
-            //Arrange
-            var repoResponse = _fixture.Create<List<PatientCarePlanVM>>();
+            //Arrange 
+            var repoResponse = _fixture.CreateMany<PatientCarePlanVM>(2); 
             var serviceResponse = new ResponseVM
             {
                 Success = true,
                 Data = new List<PatientCarePlanVM>(),
                 Message = ResponseConstants.Found
-            };
+            };  
             _repositoryMock.Setup(x => x.GetAllPatientCarePlans())
-                           .ReturnsAsync(repoResponse);
+                           .ReturnsAsync(repoResponse.ToList());
 
             //Act
             var result = await _sut.GetAllPatientCarePlans();
@@ -277,17 +292,16 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
 
         #region Create
-
-
+    
+         
         [Fact]
         public async Task CreatePatientsCarePlan_ShouldReturnData_WhenInsertedSuccessfully()
         {
             //Arrange
-
+             
             var repoRequest = _fixture.Create<PatientCarePlans>();
             long repoResponse = 2;
-
-            var serviceRequest = _fixture.Create<PatientCarePlanDto>();
+             
             var serviceResponse = new ResponseVM
             {
                 Success = true,
@@ -295,12 +309,18 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
                 Message = ResponseConstants.Saved
             };
 
+            repoRequest.ActualEndDate = repoRequest.ActualStartDate.AddYears(1);
 
-            _repositoryMock.Setup(x => x.AddPatientCarePlan(repoRequest))
-                .ReturnsAsync(4);
+            _repositoryMock.Setup(x => x.AddPatientCarePlan(It.IsAny<PatientCarePlans>()))
+                                 .ReturnsAsync(repoResponse);
+
+            _repositoryMock.Setup(x => x.IsUsernameExist(It.IsAny<string>())).ReturnsAsync(false);
+             
+             
 
             //Act
-            var result = await _sut.AddPatientCarePlan(serviceRequest);
+            var result = await _sut.AddPatientCarePlan(_modelWithCompletedSetToTrue);
+
 
             //Assert
             result.Should().BeAssignableTo<ResponseVM>();
@@ -311,13 +331,56 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
 
             result.Success.Should().BeTrue();
-            result.Data.Should().BeNull();
+            result.Data.Should().NotBeNull();
             result.Message.Should().BeEquivalentTo(ResponseConstants.Saved);
 
 
-            _repositoryMock.Verify(x => x.AddPatientCarePlan(repoRequest), Times.Once());
+            _repositoryMock.Verify(x => x.AddPatientCarePlan(repoRequest), Times.Never());
         }
-        
+
+
+
+        [Fact]
+        public async Task CreatePatientsCarePlan_ShouldUsernameExists_WhenUsernameExists()
+        {
+            //Arrange 
+            var repoRequest = _fixture.Create<PatientCarePlans>();
+            long repoResponse = 2;
+             
+            var serviceResponse = new ResponseVM
+            {
+                Success = true,
+                Data = 2,
+                Message = ResponseConstants.Saved
+            };
+
+            repoRequest.ActualEndDate = repoRequest.ActualStartDate.AddYears(1);
+
+            _repositoryMock.Setup(x => x.AddPatientCarePlan(It.IsAny<PatientCarePlans>()))
+                                 .ReturnsAsync(repoResponse);
+
+            _repositoryMock.Setup(x => x.IsUsernameExist(It.IsAny<string>())).ReturnsAsync(true);
+             
+
+            //Act
+            var result = await _sut.AddPatientCarePlan(_modelWithCompletedSetToTrue);
+
+
+            //Assert
+            result.Should().BeAssignableTo<ResponseVM>();
+            result.Should()
+                .NotBeNull()
+                .And
+                .BeOfType(serviceResponse.GetType());
+
+
+            result.Success.Should().BeFalse();
+            result.Data.Should().BeNull();
+            result.Message.Should().BeEquivalentTo(ResponseConstants.IsExist);
+
+
+            _repositoryMock.Verify(x => x.AddPatientCarePlan(repoRequest), Times.Never());
+        }
 
         [Fact]
         public async Task CreatePatientsCarePlan_ShouldReturnInvalidObject_WhenNullObjectisPassed()
@@ -441,9 +504,9 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
 
         [Theory]
-        [InlineData("CompletedYes", "true")]
-        [InlineData("CompletedNo", "false")] 
-        public async Task CreatePatientsCarePlan_ShouldReturnPass_WhenCompletedYesAndRequiredFieldIsPassed(string testCase, string value)
+        [InlineData("CompletedYes_ParametaerPassed")]
+        [InlineData("CompletedNo_ParametaerPassed")] 
+        public async Task CreatePatientsCarePlan_ShouldReturnPass_WhenCompletedYesAndNoRequiredFieldIsPassed(string testCase)
         {
             //Arrange
 
@@ -459,22 +522,22 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
             };
             switch (testCase)
             {
-                case "CompletedYes":
-                    serviceRequest.Completed = Convert.ToBoolean(value);
+                case "CompletedYes_ParametaerPassed":
+                    serviceRequest.Completed = true;
                     serviceRequest.Outcome = _fixture.Create<string>();
                     serviceRequest.ActualEndDate = serviceRequest.ActualStartDate.AddDays(30);
                     break;
 
-                case "CompletedNo":
-                    serviceRequest.Completed = Convert.ToBoolean(value);
+                case "CompletedNo_ParametaerPassed":
+                    serviceRequest.Completed = false;
                     serviceRequest.Outcome = null;
                     serviceRequest.ActualEndDate = Convert.ToDateTime("0001-01-01 00:00:00.0000000");
                     break;
  
             }
 
-            _repositoryMock.Setup(x => x.AddPatientCarePlan(repoRequest))
-                .ReturnsAsync(repoResponse);
+            _repositoryMock.Setup(x => x.AddPatientCarePlan(It.IsAny<PatientCarePlans>()))
+                                 .ReturnsAsync(repoResponse); 
 
             //Act
             var result = await _sut.AddPatientCarePlan(serviceRequest);
@@ -488,7 +551,7 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
 
             result.Success.Should().BeTrue();
-            result.Data.Should().BeNull();
+            result.Data.Should().NotBeNull();
 
 
             _repositoryMock.Verify(x => x.AddPatientCarePlan(repoRequest), Times.Never());
@@ -498,10 +561,8 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
 
 
-        [Theory]
-        [InlineData("CompletedYes", "true")]
-        [InlineData("CompletedNo", "false")]
-        public async Task CreatePatientsCarePlan_ShouldReturnFail_WhenCompletedYesAndRequiredFieldIsNotPassed(string testCase, string value)
+        [Fact] 
+        public async Task CreatePatientsCarePlan_ShouldReturnFail_WhenCompletedYesRequiredFieldIsNotPassed()
         {
             //Arrange
 
@@ -515,24 +576,15 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
                 Data = 2,
                 Message = ResponseConstants.Saved
             };
-            switch (testCase)
-            {
-                case "CompletedYes":
-                    serviceRequest.Completed = Convert.ToBoolean(value);
-                    serviceRequest.Outcome = null;
-                    serviceRequest.ActualEndDate = Convert.ToDateTime("0001-01-01 00:00:00.0000000");
-                    break;
+             
+            serviceRequest.Completed = true;
+            serviceRequest.Outcome = null;
+            serviceRequest.ActualEndDate = Convert.ToDateTime("0001-01-01 00:00:00.0000000");
 
-                case "CompletedNo":
-                    serviceRequest.Completed = Convert.ToBoolean(value);
-                    serviceRequest.Outcome = null;
-                    serviceRequest.ActualEndDate = Convert.ToDateTime("0001-01-01 00:00:00.0000000");
-                    break;
 
-            }
+            _repositoryMock.Setup(x => x.AddPatientCarePlan(It.IsAny<PatientCarePlans>()))
+                                         .ReturnsAsync(repoResponse);
 
-            _repositoryMock.Setup(x => x.AddPatientCarePlan(repoRequest))
-                .ReturnsAsync(repoResponse);
 
             //Act
             var result = await _sut.AddPatientCarePlan(serviceRequest);
@@ -544,18 +596,56 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
                 .And
                 .BeOfType(serviceResponse.GetType());
 
-            switch (testCase)
-            {
-                case "CompletedYes":
-                    result.Success.Should().BeFalse();
-                    break;
-
-                case "CompletedNo":
-                    result.Success.Should().BeTrue();
-                    break;
-
-            } 
+            
+            result.Success.Should().BeFalse();
             result.Data.Should().BeNull();
+
+
+            _repositoryMock.Verify(x => x.AddPatientCarePlan(repoRequest), Times.Never());
+        }
+
+        
+
+
+        [Fact] 
+        public async Task CreatePatientsCarePlan_ShouldReturnFail_WhenEndDateIsLesserThanStartDate()
+        {
+            //Arrange
+
+            var repoRequest = _fixture.Create<PatientCarePlans>();
+            long repoResponse = 2;
+
+            var serviceRequest = _fixture.Create<PatientCarePlanDto>();
+            var serviceResponse = new ResponseVM
+            {
+                Success = true,
+                Data = 2,
+                Message = ResponseConstants.Saved
+            };
+             
+
+            serviceRequest.Completed = true;
+            serviceRequest.Outcome = "Outcome";
+            serviceRequest.ActualEndDate = Convert.ToDateTime("0001-01-01 00:00:00.0000000");
+
+
+            _repositoryMock.Setup(x => x.AddPatientCarePlan(It.IsAny<PatientCarePlans>()))
+                                         .ReturnsAsync(repoResponse);
+
+
+            //Act
+            var result = await _sut.AddPatientCarePlan(serviceRequest);
+
+            //Assert
+            result.Should().BeAssignableTo<ResponseVM>();
+            result.Should()
+                .NotBeNull()
+                .And
+                .BeOfType(serviceResponse.GetType());
+
+            result.Success.Should().BeFalse();
+            result.Data.Should().BeNull();
+            result.Message.Should().BeEquivalentTo(ResponseConstants.EndDateInvalid);
 
 
             _repositoryMock.Verify(x => x.AddPatientCarePlan(repoRequest), Times.Never());
@@ -578,13 +668,14 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
             var id = _fixture.Create<int>();
             var ip = _fixture.Create<string>();
-            var repoResponse = _fixture.Create<int>();
+            var repoResponse = 2;
             var serviceResponse = new ResponseVM
             {
                 Success = true,
                 Data = 2,
                 Message = ResponseConstants.Deleted
             };
+             
 
             _repositoryMock.Setup(x => x.DeleteCarePlanById(id, ip))
             .ReturnsAsync(repoResponse);
@@ -622,6 +713,7 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
                 Data = 2,
                 Message = ResponseConstants.NotDeleted
             };
+
 
             _repositoryMock.Setup(x => x.DeleteCarePlanById(id, ip))
             .ReturnsAsync(repoResponse);
@@ -662,6 +754,7 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
             var id = testId;
             var ip = _fixture.Create<string>();
 
+             
 
             _repositoryMock.Setup(x => x.DeleteCarePlanById(id, ip))
                 .ReturnsAsync(repoResponse);
@@ -696,12 +789,10 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
         public async Task UpdatePatientsCarePlanById_ShouldReturnSuccess_WhenRecordIsUpdated()
         {
 
-            //Arrange
-            var repoRequest = _fixture.Create<PatientCarePlans>();
+            //Arrange 
             var id = _fixture.Create<int>();
             int repoResponse = 2;
-
-            var serviceRequest = _fixture.Create<PatientCarePlanDto>();
+             
             var serviceResponse = new ResponseVM
             {
                 Success = true,
@@ -710,42 +801,84 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
             };
 
 
-            
-
-            _repositoryMock.Setup(x => x.UpdateCarePlanById(id, repoRequest))
-            .ReturnsAsync(repoResponse);
+            _repositoryMock.Setup(x => x.UpdateCarePlanById(It.IsAny<long>(), It.IsAny<PatientCarePlans>()))
+                                         .Returns(Task.FromResult(repoResponse));
+               
 
             //Act
-            var result = await _sut.UpdateCarePlanById(serviceRequest, id);
+            var result = await _sut.UpdateCarePlanById(_modelWithCompletedSetToTrue, id);
 
             //Assert 
-            result.Should().BeAssignableTo<OkObjectResult>();
-            result.As<OkObjectResult>().Value
-                .Should()
+            result.Should().BeAssignableTo<ResponseVM>();
+            result.Should()
                 .NotBeNull()
                 .And
                 .BeOfType(serviceResponse.GetType());
 
-            var actualResponse = result.As<OkObjectResult>().Value;
-            var value = (ResponseVM)actualResponse ?? new ResponseVM();
-            value.Success.Should().BeTrue();
-            value.Data.Should().BeNull();
-            value.Message.Should().BeEquivalentTo(ResponseConstants.Updated);
+
+            result.Success.Should().BeTrue();
+            result.Data.Should().NotBeNull();
+            result.Message.Should().BeEquivalentTo(ResponseConstants.Updated);
 
         }
 
+
+
+        [Fact]
+        public async Task UpdatePatientsCarePlan_ShouldReturnFail_WhenEndDateIsLesserThanStartDate()
+        {
+            //Arrange
+
+            var repoRequest = _fixture.Create<PatientCarePlans>();
+            int repoResponse = 2;
+
+            var serviceRequest = _fixture.Create<PatientCarePlanDto>();
+            var serviceResponse = new ResponseVM
+            {
+                Success = true,
+                Data = 2,
+                Message = ResponseConstants.Saved
+            };
+
+
+            var id = _fixture.Create<int>();
+            serviceRequest.Completed = true;
+            serviceRequest.Outcome = "Outcome";
+            serviceRequest.ActualEndDate = Convert.ToDateTime("0001-01-01 00:00:00.0000000");
+
+
+            _repositoryMock.Setup(x => x.UpdateCarePlanById(It.IsAny<long>(), It.IsAny<PatientCarePlans>()))
+                                         .Returns(Task.FromResult(repoResponse));
+
+
+            //Act
+            var result = await _sut.UpdateCarePlanById( serviceRequest, id);
+
+            //Assert
+            result.Should().BeAssignableTo<ResponseVM>();
+            result.Should()
+                .NotBeNull()
+                .And
+                .BeOfType(serviceResponse.GetType());
+
+            result.Success.Should().BeFalse();
+            result.Data.Should().BeNull();
+            result.Message.Should().BeEquivalentTo(ResponseConstants.EndDateInvalid);
+
+
+            _repositoryMock.Verify(x => x.AddPatientCarePlan(repoRequest), Times.Never());
+        }
 
 
 
         [Fact]
         public async Task UpdatePatientsCarePlanById_ShouldReturnNoData_WhenDataNotFound()
         {
-            //Arrange
+            //Arrange 
             var repoRequest = _fixture.Create<PatientCarePlans>();
             var id = _fixture.Create<int>();
             var repoResponse = (int)DbInfo.NoIdFound;
-
-            var serviceRequest = _fixture.Create<PatientCarePlanDto>();
+             
             var serviceResponse = new ResponseVM
             {
                 Success = true,
@@ -754,13 +887,13 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
             };
 
 
+
+            _repositoryMock.Setup(x => x.UpdateCarePlanById(It.IsNotIn<long>(), It.IsAny<PatientCarePlans>()))
+                                         .Returns(Task.FromResult(repoResponse));
              
 
-            _repositoryMock.Setup(x => x.UpdateCarePlanById(id, repoRequest))
-                .ReturnsAsync(repoResponse);
-
             //Act
-            var result = await _sut.UpdateCarePlanById(serviceRequest, id);
+            var result = await _sut.UpdateCarePlanById(_modelWithCompletedSetToTrue, id);
 
             //Assert 
             result.Should().BeAssignableTo<ResponseVM>();
@@ -772,7 +905,7 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
             result.Success.Should().BeTrue();
             result.Data.Should().BeNull();
-            result.Message.Should().BeEquivalentTo(ResponseConstants.NotUpdated);
+            result.Message.Should().BeEquivalentTo(ResponseConstants.NotFound);
 
 
             _repositoryMock.Verify(x => x.UpdateCarePlanById(id, repoRequest), Times.Never());
@@ -788,8 +921,7 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
             //Arrange
             var repoRequest = _fixture.Create<PatientCarePlans>(); 
             var repoResponse = (int)DbInfo.NoIdFound;
-
-            var serviceRequest = _fixture.Create<PatientCarePlanDto>();
+             
             var serviceResponse = new ResponseVM
             {
                 Success = true,
@@ -797,14 +929,13 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
                 Message = ResponseConstants.NotUpdated
             }; 
 
-            var id = testId; 
+            var id = testId;
 
-
-            _repositoryMock.Setup(x => x.UpdateCarePlanById(id, repoRequest))
-                .ReturnsAsync(repoResponse);
+            _repositoryMock.Setup(x => x.UpdateCarePlanById(It.IsNotIn<long>(), It.IsAny<PatientCarePlans>()))
+                                         .Returns(Task.FromResult(repoResponse));
 
             //Act
-            var result = await _sut.UpdateCarePlanById(serviceRequest, id);
+            var result = await _sut.UpdateCarePlanById(_modelWithCompletedSetToTrue, id);
 
             //Assert 
             result.Should().BeAssignableTo<ResponseVM>();
@@ -816,7 +947,7 @@ namespace PatientCarePlan.Infrastructure.Tests.Services
 
             result.Success.Should().BeTrue();
             result.Data.Should().BeNull();
-            result.Message.Should().BeEquivalentTo(ResponseConstants.NotUpdated);
+            result.Message.Should().BeEquivalentTo(ResponseConstants.NotFound);
 
 
             _repositoryMock.Verify(x => x.UpdateCarePlanById(id, repoRequest), Times.Never());
