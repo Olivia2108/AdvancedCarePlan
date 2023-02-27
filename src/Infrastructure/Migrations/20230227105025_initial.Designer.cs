@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(CareContext))]
-    [Migration("20230226004527_initial")]
+    [Migration("20230227105025_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,7 +61,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("Domain.Entities.PatientCarePlan", b =>
+            modelBuilder.Entity("Domain.Entities.PatientCarePlans", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()

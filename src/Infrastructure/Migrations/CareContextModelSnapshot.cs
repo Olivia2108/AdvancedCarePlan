@@ -59,7 +59,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("Domain.Entities.PatientCarePlan", b =>
+            modelBuilder.Entity("Domain.Entities.PatientCarePlans", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
