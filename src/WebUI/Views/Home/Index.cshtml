@@ -1,8 +1,14 @@
-﻿@{
+﻿@model CarePlanWebDto
+@using Microsoft.AspNetCore.Http
+@using WebUI.Models.Dto; 
+@using static Domain.Enums.GeneralEnums;
+@inject IHttpContextAccessor accesor
+
+@{
     ViewData["Title"] = "Home Page";
 
     Layout = "~/Views/shared/_IndexLayout.cshtml";
-    int i = 0;
+    int i = 1;
 
     var min = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd");
 }
@@ -12,21 +18,62 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            $('#tblCallRequests').DataTable({
-                "scrollX": true,
-                "processing": true,
-                //"serverSide": true,
-                "ordering": true,
-                dom: 'Bfrtip',
-                buttons: [
-                    'excelHtml5',
-                    'csvHtml5'
-                ]
-            });
-        });
-    </script>
+    @{
+
+        if (!string.IsNullOrEmpty(accesor.HttpContext.Session.GetString("SuccessMsg")))
+        {
+            try
+            {
+                <script defer>
+                    $(document).ready(function () {
+
+                        swal({
+                            title: "Great!",
+                            text: '@accesor.HttpContext.Session.GetString("SuccessMsg")',
+                            type: "success",
+                            icon: "success",
+                            buttons: {
+                                confirm: { text: 'Ok', className: 'sweet-success' }
+                            }
+                        });
+                        //alert('@accesor.HttpContext.Session.GetString("SuccessMsg")');
+                    });
+                </script>
+            }
+            finally
+            {
+                accesor.HttpContext.Session.Remove("SuccessMsg");
+            }
+
+        }
+
+        if (!string.IsNullOrEmpty(accesor.HttpContext.Session.GetString("ErrorMsg")))
+        {
+            try
+            {
+                <script defer>
+                    $(document).ready(function () {
+
+                        swal({
+                            //title: "Oops!",
+                            text: '@accesor.HttpContext.Session.GetString("ErrorMsg")',
+                            type: "error",
+                            icon: "error",
+                            buttons: {
+                                confirm: { text: 'Ok', className: 'sweet-error' }
+                            }
+                        });
+                        //alert('@accesor.HttpContext.Session.GetString("ErrorMsg")');
+                    });
+                </script>
+            }
+            finally
+            {
+                accesor.HttpContext.Session.Remove("ErrorMsg");
+            }
+
+        }
+    }
 
     <script>
         $(document).ready(function () {
@@ -39,6 +86,164 @@
                 });
             });
         });
+
+
+    </script>
+
+
+    <script>
+        var createPatientPlanForm = function () {
+            const createLetter = $("#createPatientPlanForm").serialize();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Create", "Home")",
+                data: createLetter,
+                traditional: true,
+                success: function (res) {
+                    console.log(res),
+                        iziToast.success({
+                            title: 'Success',
+                            message: 'Created',
+                            position: 'topRight',
+                            closeOnClick: true
+                        });
+                    $("#exampleModal").modal("hide");
+                    location.reload();
+                },
+                error: function (res) {
+                    console.log(res),
+                        iziToast.error({
+                            title: 'Error',
+                            message: res.responseText,
+                            progressBarColor: 'rgb(0, 255, 184)',
+                            position: 'topRight'
+                        });
+
+                }
+            });
+        }
+
+
+         
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            $("#modalLoginForm").modal("show");
+            $('#OnCompletedEdit').hide();
+            $('#OnCompletedAdd').hide();
+            document.getElementById('targetStartDateAdd').valueAsDate = new Date();
+            document.getElementById('actualStartDateAdd').valueAsDate = new Date();
+
+             
+
+            $('#actualEndDateEdit').change(function () {
+
+                var valu = $('#actualEndDateEdit').val();
+                $('#endDateEdit').val(valu);
+            });
+
+            $('#completedAdd').change(function () {
+
+                var valu = $('#completedAdd').val();
+                if(valu == "1")
+                {
+
+                        document.getElementById('actualEndDateAdd').valueAsDate = new Date();
+                    $('#OnCompletedAdd').show();
+                }
+                else
+                {
+                     
+                    $('#OnCompletedAdd').hide();
+                } 
+            });
+
+            $('#completedEdit').change(function () {
+
+                var valu = $('#completedEdit').val();
+                if(valu == "1")
+                {
+                    
+                    $('#OnCompletedEdit').show();
+                }
+                else
+                {
+                    
+                    $('#OnCompletedEdit').hide();
+                } 
+            }); 
+
+             
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementsByName("setTodaysDate")[0].setAttribute('min', today);
+            document.getElementsByName("setStartDate")[0].setAttribute('min', today);
+            document.getElementsByName("setEndDate")[0].setAttribute('min', today);
+            document.getElementsByName("setEndDateEdit")[0].setAttribute('min', today);
+
+        });
+    </script>
+
+    <script>
+
+        $(function () {
+            // ON SELECTING ROW
+            $(".deleteClick").click(function () {
+
+
+                var id = $(this).parents("tr").find(".editId").text();
+                 
+                $('#idDelete').val(id);
+
+                $('#deleteModal').modal('show');
+                 
+            });
+        });
+
+
+        $(function () {
+            // ON SELECTING ROW
+            $(".editClick").click(function () {
+                //FINDING ELEMENTS OF ROWS AND STORING THEM IN VARIABLES
+                 
+                var id = $(this).parents("tr").find(".editId").text();
+                var patientName = $(this).parents("tr").find(".editPatientName").text();
+                var username = $(this).parents("tr").find(".editUsername").text();
+                var title = $(this).parents("tr").find(".editTitle").text();
+                var actualDate = $(this).parents("tr").find(".editStartDate").text();
+                var targetDate = $(this).parents("tr").find(".editTarget").text();
+                var actualendDate = $(this).parents("tr").find(".editEndDate").text();
+                var reason = $(this).parents("tr").find(".editReason").text();
+                var action = $(this).parents("tr").find(".editAction").text();
+                var outcome = $(this).parents("tr").find(".editOutcome").text();
+                var completed = $(this).parents("tr").find(".editCompleted").text();
+                var th = title.trim(" ", "");
+
+                $('#patientNameEdit').val(patientName);
+                $('#usernameEdit').val(username);
+                $('#titleEdit').val(title.trim(" ", ""));
+                $('#actualStartDateEdit').val(actualDate);
+                $('#targetStartDateEdit').val(targetDate);
+                $('#actualEndDateEdit').val(actualendDate);
+                $('#idEdit').val(id);
+                $('#reasonEdit').val(reason);
+                $('#actionEdit').val(action);
+                $('#outcomeEdit').val(outcome);
+                if(completed.trim(" ", "") == "Completed")
+                {   
+                    $('#completedEdit').val(1);
+                }
+                else{
+                    
+                    $('#completedEdit').val(0);
+                }
+                 
+                $('#EditNewPlan').modal('show');
+
+            });
+        });
+
 
 
     </script>
@@ -62,406 +267,73 @@
                 </div>
                 <div class="card-body">
                    
-                    <div class="table-responsive" style="overflow-x:visible">
+                    <div class="table-responsive">
                         <table class="table table-striped" id="table-1">
                             <thead>
                                 <tr>
-                                    <th class="text-center">
-                                        #
-                                    </th>
-                                    <th>Task Name</th>
-                                    <th>Progress</th>
-                                    <th>Members</th>
-                                    <th>Due Date</th>
+                                     
+                                    <th>S/N </th>
+                                    <th>Title</th>
+                                    <th>Patient Name</th>
+                                    <th>Username</th>
                                     <th>Status</th>
+                                    <th>Target Start Date</th>
+                                    <th>Actual Start Date</th>
+                                    <th>Actual End Date</th>
                                     <th>Action</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+                                    <th>Reason</th>
+                                    <th>Outcome</th>
+                                    <th style="display:none"></th> 
+                                    <th>Edit</th>
+                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        1
-                                    </td>
-                                    <td>Create a mobile app</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success width-per-40">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
-                                    </td>
-                                    <td>2018-01-20</td>
-                                    <td>
-                                        <div class="badge badge-success badge-shadow">Completed</div>
-                                    </td>
-                                    <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary" data-toggle="modal" data-target="#detailsModal">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary" id="modalClick"> 
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger" data-toggle="modal" data-target="#deleteModal">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        2
-                                    </td>
-                                    <td>Redesign homepage</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar width-per-60"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-3.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
-                                    </td>
-                                    <td>2018-04-10</td>
-                                    <td>
-                                        <div class="badge badge-info badge-shadow">Todo</div>
-                                    </td>
-                                     <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a class="btn btn-icon btn-primary" id="modalClick">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        3
-                                    </td>
-                                    <td>Backup database</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-warning width-per-70"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
-                                    </td>
-                                    <td>2018-01-29</td>
-                                    <td>
-                                        <div class="badge badge-warning badge-shadow">In Progress</div>
-                                    </td>
-                                     <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        4
-                                    </td>
-                                    <td>Input data</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success width-per-90"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                    </td>
-                                    <td>2018-01-16</td>
-                                    <td>
-                                        <div class="badge badge-success badge-shadow">Completed</div>
-                                    </td>
-                                    <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        5
-                                    </td>
-                                    <td>Create a mobile app</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success width-per-40">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
-                                    </td>
-                                    <td>2018-01-20</td>
-                                    <td>
-                                        <div class="badge badge-success badge-shadow">Completed</div>
-                                    </td>
-                                    <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        6
-                                    </td>
-                                    <td>Redesign homepage</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar width-per-60"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-3.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
-                                    </td>
-                                    <td>2018-04-10</td>
-                                    <td>
-                                        <div class="badge badge-info badge-shadow">Todo</div>
-                                    </td>
-                                    <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        7
-                                    </td>
-                                    <td>Backup database</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-warning width-per-70"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
-                                    </td>
-                                    <td>2018-01-29</td>
-                                    <td>
-                                        <div class="badge badge-warning badge-shadow">In Progress</div>
-                                    </td>
-                                     <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        8
-                                    </td>
-                                    <td>Input data</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success width-per-90"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                    </td>
-                                    <td>2018-01-16</td>
-                                    <td>
-                                        <div class="badge badge-success badge-shadow">Completed</div>
-                                    </td>
-                                     <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        9
-                                    </td>
-                                    <td>Create a mobile app</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success width-per-40">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
-                                    </td>
-                                    <td>2018-01-20</td>
-                                    <td>
-                                        <div class="badge badge-success badge-shadow">Completed</div>
-                                    </td>
-                                     <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        10
-                                    </td>
-                                    <td>Redesign homepage</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar width-per-60"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-3.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
-                                    </td>
-                                    <td>2018-04-10</td>
-                                    <td>
-                                        <div class="badge badge-info badge-shadow">Todo</div>
-                                    </td>
-                                    <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        11
-                                    </td>
-                                    <td>Backup database</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-warning width-per-70"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
-                                    </td>
-                                    <td>2018-01-29</td>
-                                    <td>
-                                        <div class="badge badge-warning badge-shadow">In Progress</div>
-                                    </td>
-                                    <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        12
-                                    </td>
-                                    <td>Input data</td>
-                                    <td class="align-middle">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success width-per-90"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <img alt="image" src="assets/img/users/user-2.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-5.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-4.png" width="35">
-                                        <img alt="image" src="assets/img/users/user-1.png" width="35">
-                                    </td>
-                                    <td>2018-01-16</td>
-                                    <td>
-                                        <div class="badge badge-success badge-shadow">Completed</div>
-                                    </td>
-                                    <td>Action</td>
-                                    <td><a href="#" class="btn btn-primary">View</a></td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-primary">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-icon btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
+                                @if (Model != null)
+                                {
+                                    @if (Model.List.Count > 0)
+                                    {
+                                        @foreach (var patient in Model.List)
+                                        {
+                                            <tr>
+                                                 
+                                                <td> @(i++) </td>
+                                                <td class="editTitle"> @patient.Title </td>
+                                                <td class="editPatientName"> @patient.PatientName </td>
+                                                <td class="editUsername"> @patient.UserName </td>
+                                                <td class="editCompleted">
+                                                    @if(patient.Completed)
+                                                    {
+                                                        <div class="badge badge-success badge-shadow">Completed</div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="badge badge-warning badge-shadow">In Progress</div>
+                                                    }
+                                                </td>
+                                                <td class="editTarget">@patient.TargetStartDate.ToString("yyyy-MM-dd")</td>
+                                                <td class="editStartDate" >@patient.ActualStartDate.ToString("yyyy-MM-dd")</td>
+                                                <td class="editEndDate">@patient.ActualEndDate.ToString("yyyy-MM-dd")</td>
+                                                <td class="editAction">@patient.Action</td>
+                                                <td class="editReason">@patient.Reason</td>
+                                                <td class="editOutcome">@patient.Outcome</td>
+
+                                                <td class="editId" style="display:none">@patient.Id</td>
+                                                 
+                                                <td>
+                                                    <a href="#" class="btn btn-icon btn-primary editClick" id="modalClick">
+                                                        <i class="far fa-edit"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="#" class="btn btn-icon btn-danger deleteClick">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                }  
                             </tbody>
                         </table>
                     </div>
@@ -475,151 +347,63 @@
 
     <!--Edit Plan-->
 <div class="modal fade" id="EditNewPlan" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true" role="dialog" data-backdrop="false">
-<div class="modal-dialog" role="document" style="padding-top: 7%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="planModalLabel">Add New</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form asp-action="SaveBackDatingRequests" asp-controller="BackDating" method="post">
-
-
-                <div class="modal-body">
-                    <div class="row-cols-auto">
-
-
-
-                        <div class="row" style="margin:1rem">
-                            <div class="col-12">
-                                <label class="form-label">Account Number</label>
-                                <input class="form-control font-weight-bold amt" placeholder="Account Number" name="accountNo" required onkeypress="return event.charCode === 0 || /\d/.test(String.fromCharCode(event.charCode));" />
-                            </div>
-                        </div>
-
-                        <div class="row" style="margin:1rem">
-                            <div class="col-6">
-                                <label class="form-label">Investment Amount Range</label>
-
-                                @*@{
-                                    var almRange = new List<SelectListItem>();
-                                    var almList = ViewData["Alm_Rates"] != null ? (List<FI_RateDTO>)ViewData["Alm_Rates"] : new List<FI_RateDTO>();
-                                    foreach (var alm in almList.OrderBy(x => x.Date_Uploaded).ToList().OrderBy(x => x.CUR).ToList())
-                                    {
-                                        almRange.Add(new SelectListItem { Value = alm.RANGE, Text = alm.RANGE + " (" + alm.CUR + ")" });
-                                    }
-                                }
-                                @Html.DropDownListFor(x => x.Range, almRange, "Amount Range", new { type = "text", placeholder = "Amount Range", required = "true",   @class = "form-control font-weight-bold" })*@
-
-                                     
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Interest Rate</label>
-                                <input class="form-control font-weight-bold amt" placeholder="Interest Rate" name="rate" required onkeypress="return onlyDotsAndNumbers(this,event);" />
-                            </div>
-                        </div>
-
-                        <!--<div class="row" style="margin:1rem">
-                            <div class="col-6">
-                                <label class="form-label">Investment Amount Range</label>
-                                <select name="range" required class="form-control font-weight-bold ">
-                                    <option value="" selected disabled>Amount Range</option>
-                                    <option value="<1m">Less than 1m</option>
-                                    <option value="1m to <10m">1m to less than 10m (NGN)</option>
-                                    <option value="10m to < 50m">10m to less than 50m (NGN)</option>
-                                    <option value="50m to < 100m">50m to less than 100m (NGN)</option>
-                                    <option value="100m to 500m">100m to less than 500m (NGN)</option>
-                                    <option value=">500m to 5b">More than 500m to less than 5b (NGN)</option>-->
-                                    @*<option value="< 100k">Less than 100k (USD)</option>
-                                    <option value="100k < 500k">100k to less than 500k (USD)</option>
-                                    <option value="$500k -$1m">$500k to $1m (USD)</option>
-                                    <option value="$1m -$3m">$1m to $3m (USD)</option>
-                                    <option value=">$3m - 5m">$3m to $5m (USD)</option>
-                                    <option value=">5m - 5b">$5m to $1b (USD)</option>*@
-                                <!--</select>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Interest Rate</label>
-                                <input class="form-control font-weight-bold amt" placeholder="Interest Rate" name="rate" required onkeypress="return onlyDotsAndNumbers(this,event);" />
-                            </div>
-                        </div>-->
-
-
-
-                        <div class="row" style="margin:1rem">
-                            <div class="col-6">
-                                <label class="form-label">EffectiveDate</label>
-                                <input class="form-control font-weight-bold amt" type="date" placeholder="EffectiveDate" name="effectiveDate" required min="@min" />
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Currency</label>
-                                <select name="currency" required class="form-control font-weight-bold ">
-                                    <option value="" selected disabled>Currency</option>
-                                    <option value="NGN">NGN</option>
-                                    <option value="USD">USD</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row" style="margin:1rem">
-                            <div class="col-12">
-                                <label class="form-label">Reason</label>
-                                <textarea class="form-control font-weight-bold amt" placeholder="Reason" maxlength="200" name="reason" required></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <input hidden name="route" value="Call Deposits" />
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button  class="btn btn-outline-secondary" style="color:black">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-<!-- Modal with form -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="formModal"
-     aria-hidden="true" data-backdrop="false">
     <div class="modal-dialog" role="document" style="padding-top: 7%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="formModal">Modal title</h5>
+                <h5 class="modal-title" id="planModalLabel">Edit Patient Care Plan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            
+
             <div class="modal-body">
-                <form class="">
+
+                <form asp-action="Edit" asp-controller="Home" method="post" enctype="multipart/form-data">
+
                     <div class="row">
-                        <div class="form-group col-md-6">
-                            <label>Title </label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Title </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Email" name="email">
                             </div>
+                            @{
+
+                                IList<SelectListItem> list = Enum.GetValues(typeof(Titles)).Cast<Titles>()
+                                .Select(x => new SelectListItem
+                                {
+                                    Text = x.ToString(),
+                                    Value = x.ToString()
+                                .ToString()
+                                }).ToList();
+
+                                SelectList data = new SelectList(list, "Value", "Text");
+                            }
+
+                            <select name="titleEdit" class="form-control" id="titleEdit">
+                                <option value="" selected disabled>Select an Option</option>
+                                @foreach (SelectListItem item in data)
+                                {
+                                    <option value="@(item.Value)">@item.Text</option>
+                                }
+                            </select> 
+
                         </div>
-                        <div class="form-group col-md-6">
-                            <label>Patient Name</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Patient Name</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Email" name="email">
                             </div>
+                            <input type="text" class="form-control" required id="patientNameEdit" name="patientNameEdit">
                         </div>
+                    </div>
                     </div>
 
                     <div class="row">
@@ -631,7 +415,7 @@
                                         <i class="fas fa-envelope"></i>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Email" name="email">
+                                <input type="text" required class="form-control" readonly  id="usernameEdit" name="usernameEdit">
                             </div>
                         </div>
                         <div class="form-group col-md-6">
@@ -642,7 +426,11 @@
                                         <i class="fas fa-envelope"></i>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Email" name="email">
+                                <select name="completedEdit" id="completedEdit"  required class="form-control font-weight-bold ">
+                                    <option value="" selected disabled>Select an Option</option>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -656,7 +444,8 @@
                                         <i class="fas fa-envelope"></i>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Email" name="email">
+                                
+                                <input type="date" class="form-control" id="targetStartDateEdit" name="targetStartDateEdit">
                             </div>
                         </div>
                         <div class="form-group col-md-6">
@@ -667,7 +456,7 @@
                                         <i class="fas fa-envelope"></i>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Email" name="email">
+                                <input type="date" class="form-control" id="actualStartDateEdit" name="actualStartDateEdit">
                             </div>
                         </div>
                     </div>
@@ -680,9 +469,7 @@
                             <label>Reason</label>
                             <div class="input-group">
 
-                                <textarea class="form-control">
-
-                            </textarea>
+                                <textarea name="reasonEdit" id="reasonEdit" required maxlength="1000" class="form-control"></textarea>
                             </div>
                         </div>
 
@@ -690,9 +477,7 @@
                             <label>Action</label>
                             <div class="input-group">
 
-                                <textarea class="form-control">
-
-                            </textarea>
+                                <textarea name="actionEdit" id="actionEdit"  required maxlength="1000" class="form-control"></textarea>
                             </div>
                         </div>
 
@@ -700,15 +485,13 @@
                     </div>
 
                     
-                    <div class="row">
+                    <div class="row" id="OnCompletedEdit">
 
                         <div class="form-group  col-md-6">
                             <label>Outcome</label>
                             <div class="input-group">
 
-                                <textarea class="form-control">
-
-                            </textarea>
+                                <textarea maxlength="1000" name="outcomeEdit" id="outcomeEdit" class="form-control"></textarea>
                             </div>
                         </div>
                         <div class="form-group col-md-6">
@@ -719,13 +502,188 @@
                                         <i class="fas fa-envelope"></i>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Email" name="email">
+                                <input type="date" class="form-control" id="actualEndDateEdit" name="setEndDate">
+                                <input id="endDateEdit" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+
+                     
+                    <div>
+                        <input hidden name="id" id="idEdit"  />
+                    </div>
+                    <button type="submit" class="btn btn-primary m-t-15 waves-effect" style="color:white">Proceed</button> 
+                    
+                </form>
+            </div>
+                
+            
+        </div>
+    </div>
+</div>
+
+ 
+<!-- Modal with form -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="formModal"
+     aria-hidden="true" data-backdrop="false">
+    <div class="modal-dialog" role="document" style="padding-top: 7%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="formModal">Add New Patient Plan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createPatientPlanForm" asp-controller="Home" asp-action="Index" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Title </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                @{
+
+                                    IList<SelectListItem> listAdd = Enum.GetValues(typeof(Titles)).Cast<Titles>()
+                                    .Select(x => new SelectListItem
+                                    {
+                                        Text = x.ToString(),
+                                        Value = x.ToString()
+                                    }).ToList();
+
+                                    SelectList dataAdd = new SelectList(listAdd, "Value", "Text");
+                                }
+
+                            <select name="titleAdd" class="form-control" id="titleAdd">
+                                <option value="" selected disabled>Select an Option</option>
+                                @foreach (SelectListItem item in dataAdd)
+                                {
+                                    <option value="@(item.Value)">@item.Text</option>
+                                }
+                            </select> 
+
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Patient Name</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div> 
+                                <input type="text" class="form-control"  required placeholder="Patient Name" name="patientNameAdd">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Username</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="text" required class="form-control" placeholder="Username" name="usernameAdd">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Completed</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <select name="completedAdd" id="completedAdd" required class="form-control font-weight-bold ">
+                                    <option value="" selected disabled>Select an Option</option>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Target Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="date" class="form-control" name="setTodaysDate"  placeholder="Target" id="targetStartDateAdd">  
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Actual Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="date" class="form-control"  placeholder="Actual" name="setStartDate" id="actualStartDateAdd"> 
                             </div>
                         </div>
                     </div>
 
 
-                    <button type="button" class="btn btn-primary m-t-15 waves-effect">LOGIN</button>
+                    <div class="row">
+
+
+                        <div class="form-group  col-md-6">
+                            <label>Reason</label>
+                            <div class="input-group">
+
+                                <textarea name="reasonAdd" required maxlength="1000"  class="form-control"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group  col-md-6">
+                            <label>Action</label>
+                            <div class="input-group">
+
+                                <textarea name="actionAdd" required maxlength="1000"   class="form-control"></textarea>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="row" id="OnCompletedAdd">
+
+                        <div class="form-group  col-md-6">
+                            <label>Outcome</label>
+                            <div class="input-group">
+
+                                <textarea maxlength="1000" name="outcomeAdd"  class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Actual End Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <input type="date" class="form-control" placeholder="Email"  name="setEndDate" id="actualEndDateAdd">
+                                <input id="endDate" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <button type="submit" class="btn btn-primary m-t-15 waves-effect" @*onclick="createPatientPlanForm()"*@>Proceed</button>
                 </form>
             </div>
         </div>
@@ -737,18 +695,23 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Delete</h5>
+        <h5 class="modal-title" id="exampleModalCenterTitle">Delete Patient Plan</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
-        <div class="modal-body">
-                Would you like to proceed
-        </div>
-        <div class="modal-footer bg-whitesmoke br">
-        <button type="button" class="btn btn-primary">Proceed</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
+        <form asp-controller="Home" asp-action="Delete" method="post">
+            
+            <div class="modal-body">
+                    Would you like to proceed
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <input id="idDelete" name ="deleteId" type="hidden"/>
+                <button type="submit" class="btn btn-primary" >Proceed</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </form>
+        
     </div>
     </div>
 </div>

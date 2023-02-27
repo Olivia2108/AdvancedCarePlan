@@ -271,14 +271,14 @@ namespace PatientCarePlan.Api.Tests.Controller
 
             //Assert
              
-            result.Should().BeAssignableTo<CreatedAtRouteResult>();
-            result.As<CreatedAtRouteResult>().Value
+            result.Should().BeAssignableTo<OkObjectResult>();
+            result.As<OkObjectResult>().Value
                 .Should()
                 .NotBeNull()
                 .And
                 .BeOfType(response.GetType());
 
-            var actualResponse = result.As<CreatedAtRouteResult>().Value;
+            var actualResponse = result.As<OkObjectResult>().Value;
             var value = (ResponseVM)actualResponse ?? new ResponseVM();
             value.Success.Should().BeTrue();
             value.Data.Should().NotBeNull();

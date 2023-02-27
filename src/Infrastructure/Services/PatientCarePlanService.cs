@@ -32,7 +32,11 @@ namespace Infrastructure.Services
                 {
                     case false:
                         //var errors = valid.Errors.Select(l => l.ErrorMessage).ToArray();
-                        var errors = valid.Errors.Select(l => l.ErrorMessage).FirstOrDefault();
+                        var errors = valid.Errors.Select(l => l.ErrorMessage).FirstOrDefault(); 
+                        if(errors.Contains("Actual End Date"))
+                        {
+                            errors = "Actual End Date must be greater than Actual Start Date";
+                        }
                         return new ResponseVM
                         {
                             Message = string.Join("; ", errors),
@@ -184,6 +188,10 @@ namespace Infrastructure.Services
                 {
                     case false:
                         var errors = valid.Errors.Select(l => l.ErrorMessage).FirstOrDefault();
+                        if (errors.Contains("Actual End Date"))
+                        {
+                            errors = "Actual End Date must be greater than Actual Start Date";
+                        } 
                         return new ResponseVM
                         {
                             Message = string.Join("; ", errors),
@@ -198,7 +206,7 @@ namespace Infrastructure.Services
                     PatientName = carePlanDto.PatientName,
                     UserName = carePlanDto.UserName,
                     Action = carePlanDto.Action,
-                    ActualEndDate = carePlanDto.Completed ? carePlanDto.ActualEndDate : Convert.ToDateTime("0001-01-01 00:00:00.0000000"),
+                    ActualEndDate = carePlanDto.Completed ? carePlanDto.ActualEndDate : new DateTime(),
                     ActualStartDate = carePlanDto.ActualStartDate,
                     TargetStartDate = carePlanDto.TargetStartDate,
                     Completed = carePlanDto.Completed,

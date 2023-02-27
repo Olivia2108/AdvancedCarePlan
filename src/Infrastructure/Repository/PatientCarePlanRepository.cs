@@ -85,6 +85,7 @@ namespace Infrastructure.Repository
                                         Action = x.Action,
                                         Reason = x.Reason,
                                         Outcome = x.Outcome,
+                                        Completed = x.Completed,
                                         Title= x.Title,
                                         Id= x.Id,
                                         DateCreated = x.DateCreated,

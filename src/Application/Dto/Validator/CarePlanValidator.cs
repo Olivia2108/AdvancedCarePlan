@@ -22,7 +22,7 @@ namespace Application.Dto.Validator
 			RuleFor(x => x.Outcome).NotEmpty().NotEmpty().MaximumLength(1000).When(x => x.Completed.Equals(true));
 			RuleFor(x => x.TargetStartDate).NotNull().NotEmpty();
 			RuleFor(x => x.ActualStartDate).NotNull().NotEmpty();
-			RuleFor(x => x.ActualEndDate).NotNull().NotEmpty().When(x => x.Completed.Equals(true));
+			RuleFor(x => x.ActualEndDate).NotNull().NotEmpty().GreaterThan(x=> x.ActualStartDate).When(x => x.Completed.Equals(true));
 			RuleFor(x => x.IpAddress).NotNull().NotEmpty();
 
 

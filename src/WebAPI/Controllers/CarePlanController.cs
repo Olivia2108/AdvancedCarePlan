@@ -38,7 +38,7 @@ namespace WebAPI.Controllers
                 }
 
                 var result = await _carePlanService.AddPatientCarePlan(carePlan);
-                return result.Success ? CreatedAtRoute("AddPatientCarePlan", result) : BadRequest(result);
+                return result.Success ? Ok(result) : BadRequest(result);
 
             }
             catch (Exception ex)
